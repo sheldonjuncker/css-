@@ -1,7 +1,14 @@
-//The CSS++ Bison File
+//The TCSS Bison File
 %{
-	#include <stdio.h>
-	#include <stdlib.h>
+	#include <iostream>
+	#include <cstdlib>
+	
+	int yyerror(const char *p)
+	{
+		printf("%s\n", p);
+		exit(1);
+	}
+	int yylex(void);
 %}
 
 %start stylesheet
@@ -328,9 +335,4 @@ spaces
 main()
 {
     yyparse();
-}
-
-yyerror(char *s)
-{
-    printf("%s\n", s);
 }
