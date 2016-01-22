@@ -17,27 +17,22 @@
     char* string;
 }
 
-%token <string> ANGLE
 %token <string> BAD_STRING
 %token <string> BAD_URI
 %token CDC CDO CHARSET_SYM
 %token <string> DASHMATCH
-%token DIMENSION
-%token EMS EXS
+%token <string> DIMENSION
 %token S
 %token <string> STRING
-%token <string> FREQ
 %token FUNCTION
 %token <string> HASH
 %token <string> IDENT
 %token <string> INCLUDES
 %token IMPORT_SYM IMPORTANT_SYM
-%token <string> LENGTH
 %token MEDIA_SYM
 %token <string> NUMBER
 %token PAGE_SYM
 %token <string> PERCENTAGE 
-%token <string> TIME
 %token <string> URI
 
 %type <string> type_selector
@@ -304,12 +299,7 @@ term // : unary_operator?
 term_numeral
     : NUMBER
     | PERCENTAGE
-    | LENGTH
-    | EMS
-    | EXS
-    | ANGLE
-    | TIME
-    | FREQ
+    | DIMENSION
 ;      
 
 function // : FUNCTION S* expr ')' S* ;
@@ -331,6 +321,12 @@ spaces
 ;
 
 %%
+
+/*
+	I'll need nodes (classes) for the following:
+	
+	
+*/
 
 main()
 {

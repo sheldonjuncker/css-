@@ -4,10 +4,7 @@
 %option case-insensitive
 %option noyywrap
 
-h              [0-9a-f] /*
-	Why not:
-	"#"[0-9]{3}([0-9]{3})?	{ return HEX; }
-*/
+h              [0-9a-f]
 nonascii       [\240-\377]
 unicode        \\{h}{1,6}(\r\n|[ \t\r\n\f])?
 escape         {unicode}|\\[^\r\n\f0-9a-f]
@@ -76,15 +73,16 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 {ident}	                { yylval.string = strdup(yytext);
                           return IDENT;}
 
-"#"{name}               { yylval.string = strdup(yytext);
-                          return HASH;}
+"#"[0-9]{3}([0-9]{3})?	{ yylval.string = strdup(yytext); return HASH; } /*
+"#"{name}               { yylval.string = strdup(yytext); return HASH;}
+*/
 
 @{I}{M}{P}{O}{R}{T}     {return IMPORT_SYM;}
 @{P}{A}{G}{E}           {return PAGE_SYM;}
 @{M}{E}{D}{I}{A}        {return MEDIA_SYM;}
 "@charset "             {return CHARSET_SYM;}
 
-"!"({w}|{comment})*{I}{M}{P}{O}{R}{T}{A}{N}{T}          {return IMPORTANT_SYM;}
+"!"({w}|{comment})*{I}{M}{P}{O}{R}{T}{A}{N}{T}          {return IMPORTANT_SYM;} /*
 
 {num}{E}{M}	            {return EMS;}
 {num}{E}{X}	            {return EXS;}
@@ -101,11 +99,11 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 {num}{S}		        {return TIME;}
 {num}{H}{Z}		        {return FREQ;}
 {num}{K}{H}{Z}		    {return FREQ;}
-{num}{ident}		    {return DIMENSION;} /*
+{num}{ident}		    {return DIMENSION;}
 	Why not change all of these to {num}{ident}?
 	Let the evaluator determine which is which as most (all?) will be printed out as text anyway.
 */
-
+{num}{ident}			{return DIMENSION;}
 {num}%			        {return PERCENTAGE;}
 {num}			        {return NUMBER;}
 
