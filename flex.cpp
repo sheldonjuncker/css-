@@ -1,10 +1,13 @@
 %{
-#include "bison.tab.c"
+	#include "bison.tab.cpp"
 %}
 %option case-insensitive
 %option noyywrap
 
-h              [0-9a-f]
+h              [0-9a-f] /*
+	Why not:
+	"#"[0-9]{3}([0-9]{3})?	{ return HEX; }
+*/
 nonascii       [\240-\377]
 unicode        \\{h}{1,6}(\r\n|[ \t\r\n\f])?
 escape         {unicode}|\\[^\r\n\f0-9a-f]
@@ -98,7 +101,10 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 {num}{S}		        {return TIME;}
 {num}{H}{Z}		        {return FREQ;}
 {num}{K}{H}{Z}		    {return FREQ;}
-{num}{ident}		    {return DIMENSION;}
+{num}{ident}		    {return DIMENSION;} /*
+	Why not change all of these to {num}{ident}?
+	Let the evaluator determine which is which as most (all?) will be printed out as text anyway.
+*/
 
 {num}%			        {return PERCENTAGE;}
 {num}			        {return NUMBER;}
