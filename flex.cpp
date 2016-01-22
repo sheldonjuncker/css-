@@ -32,6 +32,7 @@ s              [ \t\r\n\f]+
 w              {s}?
 nl             \n|\r\n|\r|\f
 
+/*
 A		a|\\0{0,4}(41|61)(\r\n|[ \t\r\n\f])?
 C		c|\\0{0,4}(43|63)(\r\n|[ \t\r\n\f])?
 D		d|\\0{0,4}(44|64)(\r\n|[ \t\r\n\f])?
@@ -51,6 +52,10 @@ T		t|\\0{0,4}(54|74)(\r\n|[ \t\r\n\f])?|\\t
 U       u|\\0{0,4}(55|75)(\r\n|[ \t\r\n\f])?|\\u
 X		x|\\0{0,4}(58|78)(\r\n|[ \t\r\n\f])?|\\x
 Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
+*/
+/*
+	Why not remove all of these and simply use characters? The parser is case-insensetive so it shouldn't make a difference.
+*/
 
 %%
 
@@ -77,12 +82,13 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 "#"{name}               { yylval.string = strdup(yytext); return HASH;}
 */
 
-@{I}{M}{P}{O}{R}{T}     {return IMPORT_SYM;}
-@{P}{A}{G}{E}           {return PAGE_SYM;}
-@{M}{E}{D}{I}{A}        {return MEDIA_SYM;}
-"@charset "             {return CHARSET_SYM;}
+"@import"     		{return IMPORT_SYM;}
+"@page"           	{return PAGE_SYM;}
+"@media"       		{return MEDIA_SYM;}
+"@charset "         {return CHARSET_SYM;}
 
-"!"({w}|{comment})*{I}{M}{P}{O}{R}{T}{A}{N}{T}          {return IMPORTANT_SYM;} /*
+"!"({w}|{comment})*"important"          {return IMPORTANT_SYM;} /*
+Why can't the above simply be "!important"?
 
 {num}{E}{M}	            {return EMS;}
 {num}{E}{X}	            {return EXS;}
