@@ -48,7 +48,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 
 %%
 
-{s} { return S; }/* ignore spaces */
+{s} /* ignore spaces */
 
 \/\*[^*]*\*+([^/*][^*]*\*+)*\/       /* ignore comments */
 

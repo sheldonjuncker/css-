@@ -22,9 +22,7 @@
 	Nodes *stmts;
 }
 
-%token <string> BAD_STRING
-%token <string> BAD_URI
-%token CHARSET_SYM S
+%token CHARSET_SYM
 %token <string> DASHMATCH
 %token <string> DIMENSION
 %token <string> STRING
@@ -203,7 +201,7 @@ simple_selector
 ;
 
 id_selector
-    : HASH
+    : '#' IDENT
     {  }
 ;
 
