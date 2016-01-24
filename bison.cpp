@@ -24,7 +24,7 @@
 
 %token <string> BAD_STRING
 %token <string> BAD_URI
-%token CDC CDO CHARSET_SYM
+%token CHARSET_SYM
 %token <string> DASHMATCH
 %token <string> DIMENSION
 %token S
@@ -59,7 +59,7 @@
 stylesheet // : [ CHARSET_SYM STRING ';' ]?
            //   [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
            //   [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
-    : charset comments import_block body {
+    : charset import_block body {
 		
 	}
 ;
@@ -75,31 +75,19 @@ charset
     }
 ;
 
-comments
-    :
-    | comments S
-    | comments CDO
-    | comments CDC
-;
-
 import_block
     :
-    | import subcomments
+    | import
 ;
 
 body
     :
-    | body ruleset subcomments
-    | body media subcomments
-    | body page subcomments
+    | body ruleset
+    | body media
+    | body page
 ;
 
-subcomments
-    :
-    | subcomments CDO spaces
-    | subcomments CDC spaces
-;
-
+/* Import should be able to have media queries if they are to be included in the language. */
 import // : IMPORT_SYM S* [STRING|URI] S* media_list? ';' S* ;
     : IMPORT_SYM spaces STRING spaces media_list ';' spaces
     | IMPORT_SYM spaces URI spaces media_list ';' spaces

@@ -14,18 +14,14 @@ string1        \"([^\n\r\f\\"]|\\{nl}|{escape})*\"
 string2        \'([^\n\r\f\\']|\\{nl}|{escape})*\'
 badstring1     \"([^\n\r\f\\"]|\\{nl}|{escape})*\\?
 badstring2     \'([^\n\r\f\\']|\\{nl}|{escape})*\\?
-badcomment1    \/\*[^*]*\*+([^/*][^*]*\*+)*
-badcomment2    \/\*[^*]*(\*+[^/*][^*]*)*
 baduri1        url\({w}([!#$%&*-\[\]-~]|{nonascii}|{escape})*{w}
 baduri2        url\({w}{string}{w}
 baduri3        url\({w}{badstring}
-comment        \/\*[^*]*\*+([^/*][^*]*\*+)*\/
 ident          -?{nmstart}{nmchar}*
 name           {nmchar}+
 num            [0-9]+|[0-9]*"."[0-9]+
 string         {string1}|{string2}
 badstring      {badstring1}|{badstring2}
-badcomment     {badcomment1}|{badcomment2}
 baduri         {baduri1}|{baduri2}|{baduri3}
 url	           ([!#$%&*-~]|{nonascii}|{escape})*
 s              [ \t\r\n\f]+
@@ -62,10 +58,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 {s}                     {return S;}
 
 \/\*[^*]*\*+([^/*][^*]*\*+)*\/       /* ignore comments */
-{badcomment}                         /* unclosed comment at EOF */
 
-"<!--"                  {return CDO;}
-"-->"                   {return CDC;}
 "~="                    {return INCLUDES;}
 "|="                    {return DASHMATCH;}
 
@@ -87,7 +80,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 "@media"       		{return MEDIA_SYM;}
 "@charset "         {return CHARSET_SYM;}
 
-"!"({w}|{comment})*"important"          {return IMPORTANT_SYM;} /*
+"!"({w})*"important"          {return IMPORTANT_SYM;} /*
 Why can't the above simply be "!important"?
 
 {num}{E}{M}	            {return EMS;}
