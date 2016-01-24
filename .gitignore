@@ -1,3 +1,4 @@
 *.exe
 bison.tab.cpp
 lex.yy.c
+bison.output

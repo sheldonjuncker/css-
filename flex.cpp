@@ -12,17 +12,10 @@ nmstart        [_a-z]|{nonascii}|{escape}
 nmchar         [_a-z0-9-]|{nonascii}|{escape}
 string1        \"([^\n\r\f\\"]|\\{nl}|{escape})*\"
 string2        \'([^\n\r\f\\']|\\{nl}|{escape})*\'
-badstring1     \"([^\n\r\f\\"]|\\{nl}|{escape})*\\?
-badstring2     \'([^\n\r\f\\']|\\{nl}|{escape})*\\?
-baduri1        url\({w}([!#$%&*-\[\]-~]|{nonascii}|{escape})*{w}
-baduri2        url\({w}{string}{w}
-baduri3        url\({w}{badstring}
 ident          -?{nmstart}{nmchar}*
 name           {nmchar}+
 num            [0-9]+|[0-9]*"."[0-9]+
 string         {string1}|{string2}
-badstring      {badstring1}|{badstring2}
-baduri         {baduri1}|{baduri2}|{baduri3}
 url	           ([!#$%&*-~]|{nonascii}|{escape})*
 s              [ \t\r\n\f]+
 w              {s}?
@@ -55,7 +48,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 
 %%
 
-{s}                     {return S;}
+{s} { return S; }/* ignore spaces */
 
 \/\*[^*]*\*+([^/*][^*]*\*+)*\/       /* ignore comments */
 
@@ -65,8 +58,6 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 {string}                { yylval.string = strdup(yytext);
                           return STRING;
                         }
-                        
-{badstring}             {return BAD_STRING;}
 
 {ident}	                { yylval.string = strdup(yytext);
                           return IDENT;}
@@ -78,9 +69,8 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 "@import"     		{return IMPORT_SYM;}
 "@page"           	{return PAGE_SYM;}
 "@media"       		{return MEDIA_SYM;}
-"@charset "         {return CHARSET_SYM;}
-
-"!"({w})*"important"          {return IMPORTANT_SYM;} /*
+"@charset"          {return CHARSET_SYM;}
+"!important"        {return IMPORTANT_SYM;} /*
 Why can't the above simply be "!important"?
 
 {num}{E}{M}	            {return EMS;}
@@ -106,9 +96,8 @@ Why can't the above simply be "!important"?
 {num}%			        {return PERCENTAGE;}
 {num}			        {return NUMBER;}
 
-"url("{w}{string}{w}")" {return URI;}
-"url("{w}{url}{w}")"    {return URI;}
-{baduri}                {return BAD_URI;}
+"url("{string}")" {return URI;}
+"url("{url}")"    {return URI;}
 
 {ident}"("		        {return FUNCTION;}
 
