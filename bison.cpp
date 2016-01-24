@@ -2,6 +2,9 @@
 %{
 	#include <iostream>
 	#include <cstdlib>
+	#include <list>
+	#include "value.cpp"
+	#include "nodes.cpp"
 	
 	int yyerror(const char *p)
 	{
@@ -14,7 +17,9 @@
 %start stylesheet
 
 %union{
-    char* string;
+    char *string;
+	Node *exp;
+	Nodes *stmts;
 }
 
 %token <string> BAD_STRING
@@ -46,19 +51,27 @@
 %type <string> property
 %type <string> expr
 
+%type <stmts> stylesheet
+%type <exp> charset
+
 %%
 
 stylesheet // : [ CHARSET_SYM STRING ';' ]?
            //   [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
            //   [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
-    : charset comments import_block body
+    : charset comments import_block body {
+		
+	}
 ;
 
 charset
-    :
+    : /* empty */
+	{
+		$$ = NULL;
+	}
     | CHARSET_SYM STRING ';'
     {
-        
+        $$ = new CharsetNode($2);
     }
 ;
 
