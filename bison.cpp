@@ -75,9 +75,10 @@ charset
     }
 ;
 
+/* Import should be able to have media queries if they are to be included in the language. */
 import_block
     :
-    | import
+    | IMPORT_SYM
 ;
 
 body
@@ -85,14 +86,6 @@ body
     | body ruleset
     | body media
     | body page
-;
-
-/* Import should be able to have media queries if they are to be included in the language. */
-import // : IMPORT_SYM S* [STRING|URI] S* media_list? ';' S* ;
-    : IMPORT_SYM STRING media_list ';'
-    | IMPORT_SYM URI media_list ';'
-    | IMPORT_SYM STRING ';'
-    | IMPORT_SYM URI ';'
 ;
     
 media // : MEDIA_SYM S* media_list '{' S* ruleset* '}' S* ;
@@ -162,11 +155,13 @@ ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declarat
     | selector_list '{' '}'
 ;
 
+/*
+	My simpler selector list
+*/
 selector_list
     : complex_selector
-    | universal_selector
-    | selector_list ',' complex_selector
-    | selector_list ',' universal_selector
+	| complex_selector ',' selector_list
+	| complex_selector selector_list
 ;
 
 /*
@@ -177,20 +172,17 @@ selector_list
 
 complex_selector // : simple_selector [ combinator selector | S+ [ combinator? selector ]? ]? ;
     : compound_selector
-    | complex_selector combinator compound_selector
+	| complex_selector combinator compound_selector
+    | universal_selector
 ;
 
 universal_selector
-    :
-    | '*'
+    : '*'
 ;
 
 compound_selector // : element_name [ HASH | class | attrib | pseudo ]* | [ HASH | class | attrib | pseudo ]+ ;
-    : '*' type_selector
-    | type_selector
-    | '*' simple_selector
+    : type_selector
     | simple_selector
-    | compound_selector simple_selector
 ;
 
 simple_selector
