@@ -14,7 +14,7 @@ string1        \"([^\n\r\f\\"]|\\{nl}|{escape})*\"
 string2        \'([^\n\r\f\\']|\\{nl}|{escape})*\'
 ident          -?{nmstart}{nmchar}*
 name           {nmchar}+
-num            [0-9]+|[0-9]*"."[0-9]+
+num            (-|\+)?[0-9]+|[0-9]*"."[0-9]+
 string         {string1}|{string2}
 url	           ([!#$%&*-~]|{nonascii}|{escape})*
 s              [ \t\r\n\f]+

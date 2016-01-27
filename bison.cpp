@@ -125,8 +125,14 @@ pseudo_page // : ':' IDENT S* ;
 operator // : '/' S* | ',' S* ;
     : '/'
     | ','
+	| '.'
+	| '*'
+	| '+'
+	| '-'
 ;
 
+
+	
 combinator // : '+' S* | '>' S* ;
     : '+'
     {
@@ -135,12 +141,11 @@ combinator // : '+' S* | '>' S* ;
     | '>'
     {
        
-    }
-;
-
-unary_operator // : '-' | '+' ;
-    : '-'
-    | '+'
+    } 
+	| '~' //css3 rule
+	{
+		
+	}
 ;
 
 property // : IDENT S* ;
@@ -268,13 +273,13 @@ expr //: term [ operator? term ]*;
     }
     | expr operator term
     | expr term
+	| '(' expr ')'
 ;
 
 term // : unary_operator?
      // [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* | TIME S* | FREQ S* ]
      // | STRING S* | IDENT S* | URI S* | hexcolor | function ;
-    : unary_operator term_numeral
-    | term_numeral
+    : term_numeral
     | STRING
     {
         $$ = $1;
