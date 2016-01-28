@@ -2,6 +2,10 @@
 	Nodes for TCSS
 */
 
+//Definitions
+class Node;
+class Nodes;
+
 //The Node Class
 class Node
 {
@@ -76,6 +80,104 @@ class ListNode : public Node
 	ListNode(Nodes *n)
 	{
 		this->node_list = n;
+	}
+	
+	int *evaluate()
+	{
+		
+	}
+};
+
+//String Node
+class StrNode : public Node
+{
+	public:
+	char *str;
+	StrNode(char *s)
+	{
+		this->str = s;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+//Identifier Node
+class IdNode : public Node
+{
+	public:
+	char *id;
+	IdNode(char *i)
+	{
+		this->id = i;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+//URI Node
+class UriNode : public Node
+{
+	public:
+	char *uri;
+	UriNode(char *u)
+	{
+		this->uri = u;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+//Number Node
+class NumNode : public Node
+{
+	public:
+	double num;
+	NumNode(double n)
+	{
+		this->num = n;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+//Percent Node
+class PerNode : public Node
+{
+	public:
+	double per;
+	PerNode(double p)
+	{
+		this->per = p;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+//Dimension Node
+class DimNode : public Node
+{
+	public:
+	double dim;
+	char *type;
+	DimNode(double d, char *t)
+	{
+		this->dim = d;
+		this->type = t;
 	}
 	
 	int *evaluate()

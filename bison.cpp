@@ -38,18 +38,9 @@
 %token <string> PERCENTAGE 
 %token <string> URI
 
-%type <string> type_selector
-%type <string> id_selector
-%type <string> class_selector
-
-%type <string> attrib_eq
-%type <string> attrib_value
-
-%type <string> property
-
 %type <c> operator
-%type <node_list> body list
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media
+%type <node_list> body expr_list
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media property attrib_eq attrib_value function
 
 %error-verbose
 %locations
@@ -172,7 +163,7 @@ combinator // : '+' S* | '>' S* ;
 property // : IDENT S* ;
     : IDENT
     {
-        $$ = $1;
+        $$ = new IdNode($1);
     }
 ;
 
@@ -242,18 +233,18 @@ attribute_selector // : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ ID
 
 attrib_eq
     : '='
-    {   $$ = "=";    }
+    {   $$ = new StrNode("=");    }
     | INCLUDES
-    {   $$ = $1;    }
+    {   $$ = new StrNode($1);    }
     | DASHMATCH
-    {   $$ = $1;    }
+    {   $$ = new StrNode($1);    }
 ;
 
 attrib_value
     : IDENT
-    {   $$ = $1;    }
+    {   $$ = new IdNode($1);    }
     | STRING
-    {   $$ = $1;    }
+    {   $$ = new StrNode($1);    }
 ;
 
 pseudo_class_selector // : ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ] ;
@@ -271,17 +262,28 @@ pseudo_block_function_ident
 ;
 
 declarations
-    : declaration
-    | declarations ';' declaration
-    | declarations ';'
+    : declaration ';'
+    | declarations declaration ';'
 ;
 
 declaration // : property ':' S* expr prio? ;
-    : property ':' expr prio
+    : property ':' expr_list prio
     {  }
-    | property ':' expr
+    | property ':' expr_list
     {  }
 ;
+
+expr_list
+	: expr
+	{
+		$$ = new Nodes();
+		$$->push_back($1);
+	}
+	| expr_list expr
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
 
 prio // : IMPORTANT_SYM S* ;
     : IMPORTANT_SYM
@@ -292,36 +294,18 @@ expr //: term [ operator? term ]*;
     {
         $$ = $1;
     }
-    | term operator term
+    | expr operator term
 	{
 		$$ = new OpNode($1, $2, $3);
-	}
-	| list
-	{
-		$$ = new ListNode($1);
-	}
-;
-
-/*
-	List of expressions
-*/
-
-list
-	: list term
-	{
-		$1->push_back($2);
-	}
-	| term term
-	{
-		$$ = new Nodes();
-		$$->push_back($1);
-		$$->push_back($2);
 	}
 
 term // : unary_operator?
      // [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* | TIME S* | FREQ S* ]
      // | STRING S* | IDENT S* | URI S* | hexcolor | function ;
     : term_numeral
+	{
+		$$ = $1;
+	}
     | STRING
     {
         $$ = new StrNode($1);
@@ -335,7 +319,13 @@ term // : unary_operator?
         $$ = new UriNode($1);
     }
     | hexcolor
+	{
+		$$ = $1;
+	}
     | function
+	{
+		$$ = $1;
+	}
 	| '(' expr ')'
 	{
 		$$ = $2;
@@ -344,8 +334,17 @@ term // : unary_operator?
 
 term_numeral
     : NUMBER
+	{
+		$$ = new NumNode(atof($1));
+	}
     | PERCENTAGE
+	{
+		$$ = new PerNode(atof($1));
+	}
     | DIMENSION
+	{
+		$$ = new DimNode(atof($1), "px");
+	}
 ;      
 
 function // : FUNCTION S* expr ')' S* ;
