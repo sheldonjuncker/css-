@@ -18,8 +18,9 @@
 
 %union{
     char *string;
-	Node *exp;
-	Nodes *stmts;
+	Node *node;
+	Nodes *node_list;
+	char c;
 }
 
 %token CHARSET_SYM
@@ -44,12 +45,11 @@
 %type <string> attrib_eq
 %type <string> attrib_value
 
-%type <string> term
 %type <string> property
-%type <string> expr
 
-%type <stmts> stylesheet
-%type <exp> charset
+%type <c> operator
+%type <node_list> body list
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media
 
 %error-verbose
 %locations
@@ -69,7 +69,7 @@ charset
 	{
 		$$ = NULL;
 	}
-    | CHARSET_SYM STRING ';'
+    | CHARSET_SYM STRING
     {
         $$ = new CharsetNode($2);
     }
@@ -78,16 +78,37 @@ charset
 /* Import should be able to have media queries if they are to be included in the language. */
 import_block
     :
-    | IMPORT_SYM
+	{
+		$$ = NULL;
+	}
+    | IMPORT_SYM STRING
+	{ 
+		$$ = new ImportNode($2);
+	}
 ;
 
 body
     :
+	{
+		$$ = new Nodes();
+	}
     | body ruleset
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
     | body media
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
     | body page
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
 ;
-    
+
 media // : MEDIA_SYM S* media_list '{' S* ruleset* '}' S* ;
     : MEDIA_SYM media_list '{' rulesets '}'
 ;
@@ -98,7 +119,7 @@ rulesets
 ;
 
 media_list // : medium [ COMMA S* medium]* ;
-    : medium
+    : medium						
     | media_list ',' medium
 ;
 
@@ -271,10 +292,31 @@ expr //: term [ operator? term ]*;
     {
         $$ = $1;
     }
-    | expr operator term
-    | expr term
-	| '(' expr ')'
+    | term operator term
+	{
+		$$ = new OpNode($1, $2, $3);
+	}
+	| list
+	{
+		$$ = new ListNode($1);
+	}
 ;
+
+/*
+	List of expressions
+*/
+
+list
+	: list term
+	{
+		$1->push_back($2);
+	}
+	| term term
+	{
+		$$ = new Nodes();
+		$$->push_back($1);
+		$$->push_back($2);
+	}
 
 term // : unary_operator?
      // [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* | TIME S* | FREQ S* ]
@@ -282,18 +324,22 @@ term // : unary_operator?
     : term_numeral
     | STRING
     {
-        $$ = $1;
+        $$ = new StrNode($1);
     }
     | IDENT
     {
-        $$ = $1;
+        $$ = new IdNode($1);
     }
     | URI
     {
-        $$ = $1;
+        $$ = new UriNode($1);
     }
     | hexcolor
     | function
+	| '(' expr ')'
+	{
+		$$ = $2;
+	}
 ;
 
 term_numeral
@@ -319,8 +365,6 @@ hexcolor // : HASH S* ;
 
 /*
 	I'll need nodes (classes) for the following:
-	
-	
 */
 
 main()
