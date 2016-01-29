@@ -39,8 +39,8 @@
 %token <string> URI
 
 %type <c> operator combinator
-%type <node_list> body expr_list declarations
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector
+%type <node_list> body expr_list declarations selector_list
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor page media attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset
 
 %error-verbose
 %locations
@@ -195,9 +195,12 @@ property // : IDENT S* ;
 ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
     : selector_list '{' declarations '}'
 	{
-			
+		$$ = new RulesetNode($1, $3);
 	}
     | selector_list '{' '}'
+	{
+		$$ = new RulesetNode($1);	
+	}
 ;
 
 /*
@@ -205,8 +208,20 @@ ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declarat
 */
 selector_list
     : complex_selector
-	| complex_selector ',' selector_list
-	| complex_selector selector_list
+	{
+		$$ = new Nodes();
+		$$->push_back($1);
+	}
+	| selector_list ',' complex_selector
+	{
+		$1->push_back($3);
+		$$ = $1;
+	}
+	| selector_list complex_selector
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
 ;
 
 /*

@@ -189,7 +189,30 @@ class FuncNode : public Node
 };
 
 /*
-	Function Node
+	Ruleset Node
+	Example:
+		.css { color:red; }
+*/
+class RulesetNode : public Node
+{
+	public:
+	Nodes *selector_list;
+	Nodes *declarations;
+	
+	RulesetNode(Nodes *s, Nodes *d = NULL)
+	{
+		this->selector_list = s;
+		this->declarations = d;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+/*
+	Pseudo Block Node
 	Example:
 		:hover | :nth-of-type(even)
 */
