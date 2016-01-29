@@ -27,7 +27,7 @@
 %token <string> DASHMATCH
 %token <string> DIMENSION
 %token <string> STRING
-%token FUNCTION
+%token <string> FUNCTION
 %token <string> HASH
 %token <string> IDENT
 %token <string> INCLUDES
@@ -40,7 +40,7 @@
 
 %type <c> operator
 %type <node_list> body expr_list declarations
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media attrib_eq attrib_value function declaration
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media attrib_eq attrib_value function declaration  pseudo_block pseudo_expr
 
 %error-verbose
 %locations
@@ -260,12 +260,13 @@ pseudo_class_selector // : ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ] ;
 
 pseudo_block
     : IDENT
-    | FUNCTION pseudo_block_function_ident ')'
-;
-
-pseudo_block_function_ident
-    :
-    | IDENT
+	{
+		$$ = new PseudoBlockNode($1);
+	}
+    | function
+	{
+		$$ = new PseudoBlockNode($1);
+	}
 ;
 
 declarations
@@ -367,11 +368,21 @@ term_numeral
 ;      
 
 function // : FUNCTION S* expr ')' S* ;
-    : FUNCTION expr ')'
+    : FUNCTION pseudo_expr ')'
 	{
 		$$ = new FuncNode($1, $2);
 	}
 ;
+
+pseudo_expr
+	: 
+	{
+		$$ = NULL;
+	}
+	| expr
+	{
+		$$ = $1;
+	}
 
 
 // There is a constraint on the color that it must

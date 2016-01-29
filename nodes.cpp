@@ -188,6 +188,32 @@ class FuncNode : public Node
 	}
 };
 
+/*
+	Function Node
+	Example:
+		nth-of-child(even)
+*/
+class PseudoBlockNode : public Node
+{
+	public:
+	char *ident = NULL;
+	Node *function = NULL;
+	
+	PseudoBlockNode(char *i)
+	{
+		this->ident = i;
+	}
+	
+	PseudoBlockNode(Node *f)
+	{
+		this->function = f;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
 
 //URI Node
 class UriNode : public Node
