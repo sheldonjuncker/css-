@@ -191,7 +191,7 @@ class FuncNode : public Node
 /*
 	Function Node
 	Example:
-		nth-of-child(even)
+		:hover | :nth-of-type(even)
 */
 class PseudoBlockNode : public Node
 {
@@ -207,6 +207,77 @@ class PseudoBlockNode : public Node
 	PseudoBlockNode(Node *f)
 	{
 		this->function = f;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+/*
+	Selector Node
+	Example:
+		body | .class | #id
+*/
+class SelectorNode : public Node
+{
+	public:
+	char *name;
+	char type;
+	
+	SelectorNode(char *n, char t = 't')
+	{
+		this->name = n;
+		this->type = t;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+/*
+	Combinator Node
+	Example:
+		h1 + h2 | h1 > h2 | h1 ~ h2
+*/
+class CombinatorNode : public Node
+{
+	public:
+	Node *left;
+	char op;
+	Node *right;
+	
+	CombinatorNode(Node *l, char o, Node *r)
+	{
+		this->left = l;
+		this->right = r;
+		this->op = o;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+/*
+	Attribute Selector Node
+	Example:
+		[tcss] | [tcss=value]
+*/
+class AttrSelectNode : public Node
+{
+	public:
+	char *ident;
+	Node *value;
+	
+	AttrSelectNode(char *i, Node *v = NULL)
+	{
+		this->ident = i;
+		this->value = v;
 	}
 	
 	int *evaluate()

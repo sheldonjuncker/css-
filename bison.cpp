@@ -38,9 +38,9 @@
 %token <string> PERCENTAGE 
 %token <string> URI
 
-%type <c> operator
+%type <c> operator combinator
 %type <node_list> body expr_list declarations
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media attrib_eq attrib_value function declaration  pseudo_block pseudo_expr
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector
 
 %error-verbose
 %locations
@@ -139,11 +139,29 @@ pseudo_page // : ':' IDENT S* ;
 
 operator // : '/' S* | ',' S* ;
     : '/'
+	{
+		$$ = '/'
+	}
     | ','
+	{
+		$$ = ','
+	}
 	| '.'
+	{
+		$$ = '.'
+	}
 	| '*'
+	{
+		$$ = '*'
+	}
 	| '+'
+	{
+		$$ = '+'
+	}
 	| '-'
+	{
+		$$ = '-'
+	}
 ;
 
 
@@ -151,15 +169,15 @@ operator // : '/' S* | ',' S* ;
 combinator // : '+' S* | '>' S* ;
     : '+'
     {
-        
+        $$ = '+';
     }
     | '>'
     {
-       
+       $$ = '>';
     } 
 	| '~' //css3 rule
 	{
-		
+		$$ = '~';
 	}
 ;
 
@@ -176,6 +194,9 @@ property // : IDENT S* ;
 
 ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
     : selector_list '{' declarations '}'
+	{
+			
+	}
     | selector_list '{' '}'
 ;
 
@@ -196,51 +217,91 @@ selector_list
 
 complex_selector // : simple_selector [ combinator selector | S+ [ combinator? selector ]? ]? ;
     : compound_selector
+	{
+		$$ = $1;
+	}
 	| complex_selector combinator compound_selector
+	{
+		$$ = new CombinatorNode($1, $2, $3);
+	}
     | universal_selector
+	{
+		$$ = $1;
+	}
 ;
 
 universal_selector
     : '*'
+	{
+		$$ = new SelectorNode(strdup("*"));
+	}
 ;
 
 compound_selector // : element_name [ HASH | class | attrib | pseudo ]* | [ HASH | class | attrib | pseudo ]+ ;
     : type_selector
+	{
+		$$ = $1;
+	}
     | simple_selector
+	{
+		$$ = $1;
+	}
 ;
 
 simple_selector
     : attribute_selector
+	{
+		$$ = $1;
+	}
     | class_selector
+	{
+		$$ = $1;
+	}
     | id_selector
+	{
+		$$ = $1;
+	}
     | pseudo_class_selector
+	{
+		$$ = $1;
+	}
 ;
 
 id_selector
     : '#' IDENT
-    {  }
+    { 
+		$$ = new SelectorNode($2, '#');
+	}
 ;
 
 class_selector // : '.' IDENT ;
     : '.' IDENT
-    {  }
+    { 
+		$$ = new SelectorNode($2, '.');
+	}
 ;
 
 type_selector // : IDENT | '*' ;
     : IDENT
-    {  }
+    { 
+		$$ = new SelectorNode($1);
+	}
 ;
 
 attribute_selector // : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']';
     : '[' IDENT ']'
-    {  }
+    { 
+		$$ = new AttrSelectNode($2);
+	}
     | '[' IDENT attrib_eq attrib_value ']'
-    {  }
+    { 
+		$$ = new AttrSelectNode($2, $4);
+	}
 ;
 
 attrib_eq
     : '='
-    {   $$ = new StrNode("=");    }
+    {   $$ = new StrNode(strdup("="));    }
     | INCLUDES
     {   $$ = new StrNode($1);    }
     | DASHMATCH
@@ -256,6 +317,9 @@ attrib_value
 
 pseudo_class_selector // : ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ] ;
     : ':' pseudo_block
+	{
+		$$ = $2;
+	}
 ;
 
 pseudo_block
@@ -363,7 +427,8 @@ term_numeral
 	}
     | DIMENSION
 	{
-		$$ = new DimNode(atof($1), "px");
+		//Fix this
+		$$ = new DimNode(atof($1), strdup("px"));
 	}
 ;      
 
