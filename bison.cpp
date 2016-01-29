@@ -31,8 +31,7 @@
 %token <string> HASH
 %token <string> IDENT
 %token <string> INCLUDES
-%token IMPORT_SYM IMPORTANT_SYM
-%token MEDIA_SYM
+%token IMPORT_SYM IMPORTANT_SYM MEDIA_SYM
 %token <string> NUMBER
 %token PAGE_SYM
 %token <string> PERCENTAGE 
@@ -40,7 +39,7 @@
 
 %type <c> operator combinator
 %type <node_list> body expr_list declarations selector_list
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor page media attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset
 
 %error-verbose
 %locations
@@ -88,11 +87,11 @@ body
 		$1->push_back($2);
 		$$ = $1;
 	}
-    | body media
+    /*| body media
 	{
 		$1->push_back($2);
 		$$ = $1;
-	}
+	}*/
     | body page
 	{
 		$1->push_back($2);
@@ -100,18 +99,16 @@ body
 	}
 ;
 
+/*
 media // : MEDIA_SYM S* media_list '{' S* ruleset* '}' S* ;
     : MEDIA_SYM media_list '{' rulesets '}'
 	{
 		//$$ = new MediaNode($2, $4);	
 	}
 ;
+*/
 
-rulesets
-    :
-    | rulesets ruleset
-;
-
+/*
 media_list // : medium [ COMMA S* medium]* ;
     : medium						
     | media_list ',' medium
@@ -120,21 +117,18 @@ media_list // : medium [ COMMA S* medium]* ;
 medium // : IDENT S* ;
     : IDENT
 ;
+*/
 
 page // : PAGE_SYM S* pseudo_page?
      //   '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
-    : PAGE_SYM pseudo_page '{' page_declarations '}'
-    | PAGE_SYM '{' page_declarations '}'
-;
-
-page_declarations
-    : declaration
-    | page_declarations ';' declaration
-    | page_declarations ';'
-;
-
-pseudo_page // : ':' IDENT S* ;
-    : ':' IDENT
+    : PAGE_SYM ':' IDENT '{' declarations '}'
+	{
+		$$ = new PageNode($3, $5);
+	}
+    | PAGE_SYM '{' declarations '}'
+	{
+		$$ = new PageNode(NULL, $3);
+	}
 ;
 
 operator // : '/' S* | ',' S* ;

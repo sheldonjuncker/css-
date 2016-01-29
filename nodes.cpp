@@ -189,6 +189,29 @@ class FuncNode : public Node
 };
 
 /*
+	Page Node
+	Example:
+		@page [:first] { color:red; }
+*/
+class PageNode : public Node
+{
+	public:
+	char *type;
+	Nodes *declarations;
+	
+	PageNode(char *t, Nodes *d)
+	{
+		this->type = t;
+		this->declarations = d;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+/*
 	Ruleset Node
 	Example:
 		.css { color:red; }
