@@ -39,8 +39,8 @@
 %token <string> URI
 
 %type <c> operator
-%type <node_list> body expr_list
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media property attrib_eq attrib_value function
+%type <node_list> body expr_list declarations
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor ruleset page media attrib_eq attrib_value function declaration
 
 %error-verbose
 %locations
@@ -51,7 +51,7 @@ stylesheet // : [ CHARSET_SYM STRING ';' ]?
            //   [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
            //   [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
     : charset import_block body {
-		
+		$$ = new StyleNode($1, $2, $3);
 	}
 ;
 
@@ -102,6 +102,9 @@ body
 
 media // : MEDIA_SYM S* media_list '{' S* ruleset* '}' S* ;
     : MEDIA_SYM media_list '{' rulesets '}'
+	{
+		//$$ = new MediaNode($2, $4);	
+	}
 ;
 
 rulesets
@@ -160,12 +163,16 @@ combinator // : '+' S* | '>' S* ;
 	}
 ;
 
+/*
+	If a property is just an IDENT, it isn't a necessary part of the grammar.
+	
 property // : IDENT S* ;
     : IDENT
     {
         $$ = new IdNode($1);
     }
 ;
+*/
 
 ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
     : selector_list '{' declarations '}'
@@ -263,14 +270,26 @@ pseudo_block_function_ident
 
 declarations
     : declaration ';'
+	{
+		$$ = new Nodes();
+		$$->push_back($1);
+	}
     | declarations declaration ';'
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
 ;
 
 declaration // : property ':' S* expr prio? ;
-    : property ':' expr_list prio
-    {  }
-    | property ':' expr_list
-    {  }
+    : IDENT ':' expr_list prio
+    { 
+		$$ = new DeclNode($1, $3, true);
+	}
+    | IDENT ':' expr_list
+    { 
+		$$ = new DeclNode($1, $3);
+	}
 ;
 
 expr_list
@@ -349,6 +368,9 @@ term_numeral
 
 function // : FUNCTION S* expr ')' S* ;
     : FUNCTION expr ')'
+	{
+		$$ = new FuncNode($1, $2);
+	}
 ;
 
 
@@ -358,6 +380,9 @@ function // : FUNCTION S* expr ')' S* ;
 
 hexcolor // : HASH S* ;
     : HASH
+	{
+		$$ = new HashNode($1);
+	}
 ;
 
 %%

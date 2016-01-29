@@ -23,6 +23,27 @@ class Nodes : public std::list<Node *>
 	Node Types
 */
 
+//The Entire Stylesheet
+class StyleNode : public Node
+{
+	public:
+	Node *charset;
+	Node *import;
+	Nodes *body;
+	
+	StyleNode(Node *c, Node *i, Nodes *b)
+	{
+		this->charset = c;
+		this->import = i;
+		this->body = b;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
 class CharsetNode : public Node
 {
 	public:
@@ -64,6 +85,31 @@ class OpNode : public Node
 		this->left = left;
 		this->op = op;
 		this->right = right;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+/*
+	Declaration Node
+	Example:
+		font:arial serif 30px !important;
+*/
+class DeclNode : public Node
+{
+	public:
+	char *prop;
+	Nodes *value;
+	bool important;
+	
+	DeclNode(char *p, Nodes *v, bool i=false)
+	{
+		this->prop = p;
+		this->value = v;
+		this->important = i;
 	}
 	
 	int *evaluate()
@@ -119,6 +165,29 @@ class IdNode : public Node
 		return NULL;
 	}
 };
+
+/*
+	Function Node
+	Example:
+		nth-of-child(even)
+*/
+class FuncNode : public Node
+{
+	public:
+	char *name;
+	Node *exp;
+	FuncNode(char *n, Node *e)
+	{
+		this->name = n;
+		this->exp = e;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
 
 //URI Node
 class UriNode : public Node
@@ -178,6 +247,26 @@ class DimNode : public Node
 	{
 		this->dim = d;
 		this->type = t;
+	}
+	
+	int *evaluate()
+	{
+		return NULL;
+	}
+};
+
+/*
+	Hash Node
+	Example:
+		#33aaff | #3af
+*/
+class HashNode : public Node
+{
+	public:
+	char *hash;
+	HashNode(char *h)
+	{
+		this->hash = h;
 	}
 	
 	int *evaluate()
