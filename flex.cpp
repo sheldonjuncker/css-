@@ -50,7 +50,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 
 {s} /* ignore spaces */
 
-\/\*[^*]*\*+([^/*][^*]*\*+)*\/       /* ignore comments */
+\/\*[^*]*\*+([^/*][^*]*\*+)*\/ { std::cout << yytext; }       /* ignore comments */
 
 "~="                    {return INCLUDES;}
 "|="                    {return DASHMATCH;}
@@ -70,28 +70,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 "@page"           	{return PAGE_SYM;}
 "@media"       		{return MEDIA_SYM;}
 "@charset"          {return CHARSET_SYM;}
-"!important"        {return IMPORTANT_SYM;} /*
-Why can't the above simply be "!important"?
-
-{num}{E}{M}	            {return EMS;}
-{num}{E}{X}	            {return EXS;}
-{num}{P}{X}	            {return LENGTH;}
-{num}{C}{M}	            {return LENGTH;}
-{num}{M}{M}	            {return LENGTH;}
-{num}{I}{N}	            {return LENGTH;}
-{num}{P}{T}	            {return LENGTH;}
-{num}{P}{C}	            {return LENGTH;}
-{num}{D}{E}{G}		    {return ANGLE;}
-{num}{R}{A}{D}		    {return ANGLE;}
-{num}{G}{R}{A}{D}	    {return ANGLE;}
-{num}{M}{S}		        {return TIME;}
-{num}{S}		        {return TIME;}
-{num}{H}{Z}		        {return FREQ;}
-{num}{K}{H}{Z}		    {return FREQ;}
-{num}{ident}		    {return DIMENSION;}
-	Why not change all of these to {num}{ident}?
-	Let the evaluator determine which is which as most (all?) will be printed out as text anyway.
-*/
+"!important"        {return IMPORTANT_SYM;} 
 {num}{ident}			{return DIMENSION;}
 {num}%			        {return PERCENTAGE;}
 {num}			        {return NUMBER;}

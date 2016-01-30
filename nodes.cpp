@@ -497,15 +497,15 @@ class DimNode : public Node
 	public:
 	double dim;
 	std::string type;
-	DimNode(double d, std::string t)
+	DimNode(std::string t)
 	{
-		this->dim = d;
+		//this->dim = d;
 		this->type = t;
 	}
 	
 	int *evaluate()
 	{
-		std::cout << dim << type;
+		std::cout << type;
 		return NULL;
 	}
 };

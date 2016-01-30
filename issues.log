@@ -1,0 +1,7 @@
+This document contains a list of the known issues with TCSS>
+
+1. Semicolons
+Because of the structure of the parser, semicolons are requried to end lines. But in the CSS standard, final declarations do not need semicolons.
+
+2. Media Queries
+Probably the most complicated aspect of CSS is media queries. TCSS currently has no capability for them at all and I will need to research all of the possible queries and build them into if-statements.

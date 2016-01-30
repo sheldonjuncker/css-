@@ -447,7 +447,7 @@ term_numeral
     | DIMENSION
 	{
 		//Fix this
-		$$ = new DimNode(atof($1), "px");
+		$$ = new DimNode($1);
 	}
 ;      
 
