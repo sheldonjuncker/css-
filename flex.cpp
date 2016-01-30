@@ -99,7 +99,7 @@ Why can't the above simply be "!important"?
 "url("{string}")" {return URI;}
 "url("{url}")"    {return URI;}
 
-{ident}"("		        {return FUNCTION;}
+{ident}"("		        {yylval.string = strdup(yytext); return FUNCTION;}
 
 .			            {return *yytext;}
 

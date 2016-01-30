@@ -204,8 +204,9 @@ class FuncNode : public Node
 	
 	int *evaluate()
 	{
-		std::cout << name << "(";
-		this->exp->evaluate();
+		std::cout << name;
+		if(this->exp)
+			this->exp->evaluate();
 		std::cout << ")";
 		
 		return NULL;
@@ -271,6 +272,31 @@ class RulesetNode : public Node
 };
 
 /*
+	Pseudo Selector Node
+	Example:
+		a:hover | a:nth-of-type(even)
+*/
+class PseudoSelectorNode : public Node
+{
+	public:
+	Node *selector;
+	Node *pseudo;
+	
+	PseudoSelectorNode(Node *s, Node *p)
+	{
+		this->selector = s;
+		this->pseudo = p;
+	}
+	
+	int *evaluate()
+	{
+		this->selector->evaluate();
+		this->pseudo->evaluate();
+		return NULL;
+	}
+};
+
+/*
 	Pseudo Block Node
 	Example:
 		:hover | :nth-of-type(even)
@@ -294,12 +320,39 @@ class PseudoBlockNode : public Node
 	int *evaluate()
 	{
 		if(this->ident != "")
-			print(this->ident, false);
+			print(":" + this->ident, false);
 		else
+		{
+			std::cout << ":";
 			this->function->evaluate();
+		}
 		return NULL;
 	}
 };
+
+/*
+	Separator Node
+	Used for printing out commas and spaces in lists of items.
+	Example
+		html, body | html body
+*/
+class SeparatorNode : public Node
+{
+	public:
+	std::string sep;
+	
+	SeparatorNode(std::string s)
+	{
+		this->sep = s;
+	}
+	
+	int *evaluate()
+	{
+		std::cout << sep;
+		return NULL;
+	}
+};
+
 
 /*
 	Selector Node

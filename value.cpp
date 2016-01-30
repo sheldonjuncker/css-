@@ -2,13 +2,22 @@
 	The Value Class for TCSS
 */
 
+//Dimension Type
+class Dim
+{
+	public:
+	double value;
+	std::string dim;
+};
+
 //Data Types Enum
 enum Types
 {
 	INT,
 	DUB,
 	STR,
-	NUL
+	NUL,
+	DIM
 };
 
 //Value Union
@@ -18,6 +27,7 @@ union Val
 	int i;
 	double d;
 	void *p;
+	Dim *dim;
 };
 
 //Value Class

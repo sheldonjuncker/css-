@@ -209,11 +209,13 @@ selector_list
 	}
 	| selector_list ',' complex_selector
 	{
+		$1->push_back(new SeparatorNode(", "));
 		$1->push_back($3);
 		$$ = $1;
 	}
 	| selector_list complex_selector
 	{
+		$1->push_back(new SeparatorNode(" "));
 		$1->push_back($2);
 		$$ = $1;
 	}
@@ -237,6 +239,10 @@ complex_selector // : simple_selector [ combinator selector | S+ [ combinator? s
     | universal_selector
 	{
 		$$ = $1;
+	}
+	| complex_selector pseudo_class_selector
+	{
+		$$ = new PseudoSelectorNode($1, $2);
 	}
 ;
 
@@ -270,11 +276,11 @@ simple_selector
     | id_selector
 	{
 		$$ = $1;
-	}
+	}/*
     | pseudo_class_selector
 	{
 		$$ = $1;
-	}
+	}*/
 ;
 
 id_selector
