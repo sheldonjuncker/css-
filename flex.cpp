@@ -62,7 +62,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 {ident}	                { yylval.string = strdup(yytext);
                           return IDENT;}
 
-"#"[0-9]{3}([0-9]{3})?	{ yylval.string = strdup(yytext); return HASH; } /*
+"#"[0-9a-f]{3}([0-9a-f]{3})?	{ yylval.string = strdup(yytext); return HASH; } /*
 "#"{name}               { yylval.string = strdup(yytext); return HASH;}
 */
 
