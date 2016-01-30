@@ -11,12 +11,29 @@ class Node
 {
 	public:
 	virtual int *evaluate() = 0;
+	void print(std::string s, bool nl = true)
+	{
+		std::cout << s;
+		if(nl)
+		{
+			std::cout << "\n";
+		}
+	}
 };
 
 //List of Nodes (Statements)
 class Nodes : public std::list<Node *>
 {
-	
+	public:
+	//Evaluate All Nodes in a List
+	int *evaluate()
+	{
+		Nodes::iterator it;
+		for(it=this->begin(); it != this->end(); ++it)
+		{
+			(*it)->evaluate();
+		}
+	}
 };
 
 /*
@@ -40,6 +57,14 @@ class StyleNode : public Node
 	
 	int *evaluate()
 	{
+		if(this->charset)
+			this->charset->evaluate();
+		
+		if(this->import)
+			this->import->evaluate();
+		
+		if(this->body)
+			this->body->evaluate();
 		return NULL;
 	}
 };
@@ -47,14 +72,15 @@ class StyleNode : public Node
 class CharsetNode : public Node
 {
 	public:
-	char *charset;
-	CharsetNode(char *charset)
+	std::string charset;
+	CharsetNode(std::string charset)
 	{
 		this->charset = charset;
 	}
 	
 	int *evaluate()
 	{
+		print("@charset \"" + charset + "\"");
 		return NULL;
 	}
 };
@@ -62,8 +88,8 @@ class CharsetNode : public Node
 class ImportNode : public Node
 {
 	public:
-	char *import;
-	ImportNode(char *import = NULL)
+	std::string import;
+	ImportNode(std::string import = NULL)
 	{
 		this->import = import;
 	}
@@ -101,11 +127,11 @@ class OpNode : public Node
 class DeclNode : public Node
 {
 	public:
-	char *prop;
+	std::string prop;
 	Nodes *value;
 	bool important;
 	
-	DeclNode(char *p, Nodes *v, bool i=false)
+	DeclNode(std::string p, Nodes *v, bool i=false)
 	{
 		this->prop = p;
 		this->value = v;
@@ -138,8 +164,8 @@ class ListNode : public Node
 class StrNode : public Node
 {
 	public:
-	char *str;
-	StrNode(char *s)
+	std::string str;
+	StrNode(std::string s)
 	{
 		this->str = s;
 	}
@@ -154,8 +180,8 @@ class StrNode : public Node
 class IdNode : public Node
 {
 	public:
-	char *id;
-	IdNode(char *i)
+	std::string id;
+	IdNode(std::string i)
 	{
 		this->id = i;
 	}
@@ -174,9 +200,9 @@ class IdNode : public Node
 class FuncNode : public Node
 {
 	public:
-	char *name;
+	std::string name;
 	Node *exp;
-	FuncNode(char *n, Node *e)
+	FuncNode(std::string n, Node *e)
 	{
 		this->name = n;
 		this->exp = e;
@@ -196,10 +222,10 @@ class FuncNode : public Node
 class PageNode : public Node
 {
 	public:
-	char *type;
+	std::string type;
 	Nodes *declarations;
 	
-	PageNode(char *t, Nodes *d)
+	PageNode(std::string t, Nodes *d)
 	{
 		this->type = t;
 		this->declarations = d;
@@ -242,10 +268,10 @@ class RulesetNode : public Node
 class PseudoBlockNode : public Node
 {
 	public:
-	char *ident = NULL;
+	std::string ident = NULL;
 	Node *function = NULL;
 	
-	PseudoBlockNode(char *i)
+	PseudoBlockNode(std::string i)
 	{
 		this->ident = i;
 	}
@@ -269,10 +295,10 @@ class PseudoBlockNode : public Node
 class SelectorNode : public Node
 {
 	public:
-	char *name;
+	std::string name;
 	char type;
 	
-	SelectorNode(char *n, char t = 't')
+	SelectorNode(std::string n, char t = 't')
 	{
 		this->name = n;
 		this->type = t;
@@ -317,10 +343,10 @@ class CombinatorNode : public Node
 class AttrSelectNode : public Node
 {
 	public:
-	char *ident;
+	std::string ident;
 	Node *value;
 	
-	AttrSelectNode(char *i, Node *v = NULL)
+	AttrSelectNode(std::string i, Node *v = NULL)
 	{
 		this->ident = i;
 		this->value = v;
@@ -336,8 +362,8 @@ class AttrSelectNode : public Node
 class UriNode : public Node
 {
 	public:
-	char *uri;
-	UriNode(char *u)
+	std::string uri;
+	UriNode(std::string u)
 	{
 		this->uri = u;
 	}
@@ -385,8 +411,8 @@ class DimNode : public Node
 {
 	public:
 	double dim;
-	char *type;
-	DimNode(double d, char *t)
+	std::string type;
+	DimNode(double d, std::string t)
 	{
 		this->dim = d;
 		this->type = t;
@@ -406,8 +432,8 @@ class DimNode : public Node
 class HashNode : public Node
 {
 	public:
-	char *hash;
-	HashNode(char *h)
+	std::string hash;
+	HashNode(std::string h)
 	{
 		this->hash = h;
 	}

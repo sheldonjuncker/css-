@@ -51,6 +51,7 @@ stylesheet // : [ CHARSET_SYM STRING ';' ]?
            //   [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
     : charset import_block body {
 		$$ = new StyleNode($1, $2, $3);
+		$$->evaluate();
 	}
 ;
 
@@ -242,7 +243,7 @@ complex_selector // : simple_selector [ combinator selector | S+ [ combinator? s
 universal_selector
     : '*'
 	{
-		$$ = new SelectorNode(strdup("*"));
+		$$ = new SelectorNode("*");
 	}
 ;
 
@@ -310,7 +311,7 @@ attribute_selector // : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ ID
 
 attrib_eq
     : '='
-    {   $$ = new StrNode(strdup("="));    }
+    {   $$ = new StrNode("=");    }
     | INCLUDES
     {   $$ = new StrNode($1);    }
     | DASHMATCH
@@ -437,7 +438,7 @@ term_numeral
     | DIMENSION
 	{
 		//Fix this
-		$$ = new DimNode(atof($1), strdup("px"));
+		$$ = new DimNode(atof($1), "px");
 	}
 ;      
 
