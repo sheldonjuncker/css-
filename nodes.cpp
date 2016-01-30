@@ -116,6 +116,11 @@ class OpNode : public Node
 	
 	int *evaluate()
 	{
+		this->left->evaluate();
+		if(this->op != ',')
+			std::cout << " ";
+		std::cout << op << " ";
+		this->right->evaluate();
 		return NULL;
 	}
 };

@@ -383,6 +383,7 @@ expr_list
 	}
 	| expr_list expr
 	{
+		$1->push_back(new SeparatorNode(" "));
 		$1->push_back($2);
 		$$ = $1;
 	}
