@@ -96,6 +96,7 @@ class ImportNode : public Node
 	
 	int *evaluate()
 	{
+		print("@import \"" + import + "\"");
 		return NULL;
 	}
 };
@@ -140,23 +141,14 @@ class DeclNode : public Node
 	
 	int *evaluate()
 	{
+		std::cout << "\t" << prop << ": ";
+		this->value->evaluate();
+		if(this->important)
+		{
+			std::cout << "!important";
+		}
+		std::cout << ";\n";
 		return NULL;
-	}
-};
-
-//List Node
-class ListNode : public Node
-{
-	public:
-	Nodes *node_list;
-	ListNode(Nodes *n)
-	{
-		this->node_list = n;
-	}
-	
-	int *evaluate()
-	{
-		
 	}
 };
 
@@ -172,6 +164,7 @@ class StrNode : public Node
 	
 	int *evaluate()
 	{
+		print(str, false);
 		return NULL;
 	}
 };
@@ -188,6 +181,7 @@ class IdNode : public Node
 	
 	int *evaluate()
 	{
+		print(id, false);
 		return NULL;
 	}
 };
@@ -210,6 +204,10 @@ class FuncNode : public Node
 	
 	int *evaluate()
 	{
+		std::cout << name << "(";
+		this->exp->evaluate();
+		std::cout << ")";
+		
 		return NULL;
 	}
 };
@@ -233,6 +231,13 @@ class PageNode : public Node
 	
 	int *evaluate()
 	{
+		std::cout << "@page";
+		if(this->type != "")
+			std::cout << " :" << type;
+		std::cout << "{\n";
+		this->declarations->evaluate();
+		std::cout << "}";
+		
 		return NULL;
 	}
 };
@@ -256,6 +261,11 @@ class RulesetNode : public Node
 	
 	int *evaluate()
 	{
+		this->selector_list->evaluate();
+		print("{");
+		if(this->declarations)
+			this->declarations->evaluate();
+		print("}");
 		return NULL;
 	}
 };
@@ -268,7 +278,7 @@ class RulesetNode : public Node
 class PseudoBlockNode : public Node
 {
 	public:
-	std::string ident = NULL;
+	std::string ident;
 	Node *function = NULL;
 	
 	PseudoBlockNode(std::string i)
@@ -283,6 +293,10 @@ class PseudoBlockNode : public Node
 	
 	int *evaluate()
 	{
+		if(this->ident != "")
+			print(this->ident, false);
+		else
+			this->function->evaluate();
 		return NULL;
 	}
 };
@@ -296,16 +310,15 @@ class SelectorNode : public Node
 {
 	public:
 	std::string name;
-	char type;
 	
-	SelectorNode(std::string n, char t = 't')
+	SelectorNode(std::string n)
 	{
 		this->name = n;
-		this->type = t;
 	}
 	
 	int *evaluate()
 	{
+		print(this->name, false);
 		return NULL;
 	}
 };
@@ -331,6 +344,9 @@ class CombinatorNode : public Node
 	
 	int *evaluate()
 	{
+		this->left->evaluate();
+		std:: cout << " " << this->op << " ";
+		this->right->evaluate();
 		return NULL;
 	}
 };
@@ -354,6 +370,14 @@ class AttrSelectNode : public Node
 	
 	int *evaluate()
 	{
+		print("[", false);
+		print(this->ident, false);
+		if(this->value)
+		{
+			print("=", false);
+			this->value->evaluate();
+		}
+		print("]", false);
 		return NULL;
 	}
 };
@@ -370,6 +394,7 @@ class UriNode : public Node
 	
 	int *evaluate()
 	{
+		print(this->uri, false);
 		return NULL;
 	}
 };
@@ -386,6 +411,7 @@ class NumNode : public Node
 	
 	int *evaluate()
 	{
+		std::cout << num;
 		return NULL;
 	}
 };
@@ -402,6 +428,7 @@ class PerNode : public Node
 	
 	int *evaluate()
 	{
+		std::cout << per;
 		return NULL;
 	}
 };
@@ -420,6 +447,7 @@ class DimNode : public Node
 	
 	int *evaluate()
 	{
+		std::cout << dim << type;
 		return NULL;
 	}
 };
@@ -440,6 +468,7 @@ class HashNode : public Node
 	
 	int *evaluate()
 	{
+		print(hash, false);
 		return NULL;
 	}
 };

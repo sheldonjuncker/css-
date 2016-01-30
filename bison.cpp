@@ -128,7 +128,7 @@ page // : PAGE_SYM S* pseudo_page?
 	}
     | PAGE_SYM '{' declarations '}'
 	{
-		$$ = new PageNode(NULL, $3);
+		$$ = new PageNode("", $3);
 	}
 ;
 
@@ -280,14 +280,16 @@ simple_selector
 id_selector
     : '#' IDENT
     { 
-		$$ = new SelectorNode($2, '#');
+		std::string tmp = $2;
+		$$ = new SelectorNode("#" + tmp);
 	}
 ;
 
 class_selector // : '.' IDENT ;
     : '.' IDENT
     { 
-		$$ = new SelectorNode($2, '.');
+		std::string tmp = $2;
+		$$ = new SelectorNode("." + tmp);
 	}
 ;
 
