@@ -240,9 +240,13 @@ complex_selector // : simple_selector [ combinator selector | S+ [ combinator? s
 	{
 		$$ = $1;
 	}
-	| complex_selector pseudo_class_selector
+	| ':' ':' IDENT
 	{
-		$$ = new PseudoSelectorNode($1, $2);
+		$$ = new PseudoElementNode($3);
+	}
+	| pseudo_class_selector
+	{
+		$$ = $1;
 	}
 ;
 

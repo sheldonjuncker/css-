@@ -336,6 +336,29 @@ class PseudoBlockNode : public Node
 };
 
 /*
+	Pseudo Element Node
+	Example:
+		::selection
+*/
+class PseudoElementNode : public Node
+{
+	public:
+	std::string name;
+	
+	PseudoElementNode(std::string n)
+	{
+		this->name = n;
+	}
+	
+	int *evaluate()
+	{
+		std::cout << "::" << name;
+		return NULL;
+	}
+};
+
+
+/*
 	Separator Node
 	Used for printing out commas and spaces in lists of items.
 	Example
