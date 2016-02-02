@@ -22,27 +22,6 @@ w              {s}?
 nl             \n|\r\n|\r|\f
 
 /*
-A		a|\\0{0,4}(41|61)(\r\n|[ \t\r\n\f])?
-C		c|\\0{0,4}(43|63)(\r\n|[ \t\r\n\f])?
-D		d|\\0{0,4}(44|64)(\r\n|[ \t\r\n\f])?
-E		e|\\0{0,4}(45|65)(\r\n|[ \t\r\n\f])?
-G		g|\\0{0,4}(47|67)(\r\n|[ \t\r\n\f])?|\\g
-H		h|\\0{0,4}(48|68)(\r\n|[ \t\r\n\f])?|\\h
-I		i|\\0{0,4}(49|69)(\r\n|[ \t\r\n\f])?|\\i
-K		k|\\0{0,4}(4b|6b)(\r\n|[ \t\r\n\f])?|\\k
-L       l|\\0{0,4}(4c|6c)(\r\n|[ \t\r\n\f])?|\\l
-M		m|\\0{0,4}(4d|6d)(\r\n|[ \t\r\n\f])?|\\m
-N		n|\\0{0,4}(4e|6e)(\r\n|[ \t\r\n\f])?|\\n
-O		o|\\0{0,4}(4f|6f)(\r\n|[ \t\r\n\f])?|\\o
-P		p|\\0{0,4}(50|70)(\r\n|[ \t\r\n\f])?|\\p
-R		r|\\0{0,4}(52|72)(\r\n|[ \t\r\n\f])?|\\r
-S		s|\\0{0,4}(53|73)(\r\n|[ \t\r\n\f])?|\\s
-T		t|\\0{0,4}(54|74)(\r\n|[ \t\r\n\f])?|\\t
-U       u|\\0{0,4}(55|75)(\r\n|[ \t\r\n\f])?|\\u
-X		x|\\0{0,4}(58|78)(\r\n|[ \t\r\n\f])?|\\x
-Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
-*/
-/*
 	Why not remove all of these and simply use characters? The parser is case-insensetive so it shouldn't make a difference.
 */
 
@@ -50,7 +29,8 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 
 {s} /* ignore spaces */
 
-\/\*[^*]*\*+([^/*][^*]*\*+)*\/ { std::cout << yytext; }       /* ignore comments */
+\/\*[^*]*\*+([^/*][^*]*\*+)*\/       /* ignore comments */
+\/\/.*
 
 "~="                    {return INCLUDES;}
 "|="                    {return DASHMATCH;}
