@@ -352,14 +352,18 @@ pseudo_block
 ;
 
 declarations
-    : declaration ';'
+    : declaration
 	{
 		$$ = new Nodes();
 		$$->push_back($1);
 	}
-    | declarations declaration ';'
+    | declarations ';' declaration
 	{
-		$1->push_back($2);
+		$1->push_back($3);
+		$$ = $1;
+	}
+	| declarations ';'
+	{
 		$$ = $1;
 	}
 ;
