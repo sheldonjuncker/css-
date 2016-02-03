@@ -317,7 +317,7 @@ attribute_selector // : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ ID
 	}
     | '[' IDENT attrib_eq attrib_value ']'
     { 
-		$$ = new AttrSelectNode($2, $4);
+		$$ = new AttrSelectNode($2, $3, $4);
 	}
 ;
 
@@ -325,9 +325,9 @@ attrib_eq
     : '='
     {   $$ = new StrNode("=");    }
     | INCLUDES
-    {   $$ = new StrNode($1);    }
+    {   $$ = new StrNode("~=");    }
     | DASHMATCH
-    {   $$ = new StrNode($1);    }
+    {   $$ = new StrNode("|=");    }
 ;
 
 attrib_value
@@ -472,6 +472,10 @@ pseudo_expr
 		$$ = NULL;
 	}
 	| expr
+	{
+		$$ = $1;
+	}
+	| pseudo_class_selector
 	{
 		$$ = $1;
 	}

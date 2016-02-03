@@ -441,11 +441,13 @@ class AttrSelectNode : public Node
 {
 	public:
 	std::string ident;
+	Node *op;
 	Node *value;
 	
-	AttrSelectNode(std::string i, Node *v = NULL)
+	AttrSelectNode(std::string i, Node *o = NULL, Node *v = NULL)
 	{
 		this->ident = i;
+		this->op = o;
 		this->value = v;
 	}
 	
@@ -455,7 +457,7 @@ class AttrSelectNode : public Node
 		print(this->ident, false);
 		if(this->value)
 		{
-			print("=", false);
+			this->op->evaluate();
 			this->value->evaluate();
 		}
 		print("]", false);

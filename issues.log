@@ -1,4 +1,4 @@
 This document contains a list of the known issues with TCSS
 
-2. Media Queries
+1. Media Queries
 Probably the most complicated aspect of CSS is media queries. TCSS currently has no capability for them at all and I will need to research all of the possible queries and build them into if-statements.
