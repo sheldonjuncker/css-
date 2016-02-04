@@ -249,6 +249,31 @@ class PageNode : public Node
 };
 
 /*
+	Variable Node
+	Example:
+		$Vars{ mainColor: red; }
+*/
+class VarNode : public Node
+{
+	public:
+	std::string className;
+	Nodes *declarations;
+	
+	VarNode(std::string c, Nodes *d = NULL)
+	{
+		this->className = c;
+		this->declarations = d;
+	}
+	
+	int *evaluate()
+	{
+		
+		return NULL;
+	}
+};
+
+
+/*
 	Ruleset Node
 	Example:
 		.css { color:red; }

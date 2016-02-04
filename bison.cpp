@@ -39,7 +39,7 @@
 
 %type <c> operator combinator
 %type <node_list> body expr_list declarations selector_list
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset variables
 
 %error-verbose
 %locations
@@ -93,6 +93,11 @@ body
 		$1->push_back($2);
 		$$ = $1;
 	}*/
+	| body variables
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
     | body page
 	{
 		$1->push_back($2);
@@ -197,6 +202,16 @@ ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declarat
 		$$ = new RulesetNode($1);	
 	}
 ;
+
+variables
+	: '$' IDENT '{' declarations '}'
+	{
+		$$ = new VarNode($2, $4);
+	}
+	| '$' IDENT '{' '}'
+	{
+		$$ = new VarNode($2, NULL);	
+	}
 
 /*
 	My simpler selector list
