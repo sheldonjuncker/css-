@@ -2,12 +2,15 @@
 	The Value Class for TCSS
 */
 
+//Value Definition
+class Value;
+
 //Dimension Type
-class Dim
+struct Dim
 {
 	public:
 	double value;
-	std::string dim;
+	std::string dim; //px, em, %, etc.
 };
 
 //Data Types Enum
@@ -17,17 +20,20 @@ enum Types
 	DUB,
 	STR,
 	NUL,
-	DIM
+	DIM,
+	HEX,
+	LIST
 };
 
 //Value Union
 union Val
 {
-	char *s;
+	std::string *s;
 	int i;
 	double d;
 	void *p;
 	Dim *dim;
+	std::list<Value *> *l;
 };
 
 //Value Class
@@ -47,10 +53,10 @@ class Value
 	}
 	
 	//String Constructor
-	Value(char *s)
+	Value(std::string s)
 	{
 		this->t = STR;
-		this->v.s = s;
+		this->v.s = new std::string(s);
 	}
 	
 	//Double Constructor
@@ -65,5 +71,42 @@ class Value
 	{
 		this->t = INT;
 		this->v.i = i;
+	}
+	
+	/*
+		Member Functions
+	*/
+	
+	//Convert to String
+	std::string toString()
+	{
+		switch(this->t)
+		{
+			case INT:
+			
+			break;
+			
+			case DUB:
+			
+			break;
+			
+			case STR:
+				return *(v.s);
+			break;
+			
+			case NUL:
+				return "";
+			break;
+			
+			case DIM:
+			
+			break;
+			
+			case HEX:
+				return "#" + *(v.s);
+			break;
+			
+		}
+		return "";
 	}
 };

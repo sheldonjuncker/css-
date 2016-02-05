@@ -3,6 +3,7 @@
 	#include <iostream>
 	#include <cstdlib>
 	#include <list>
+	#include <map>
 	#include "value.cpp"
 	#include "nodes.cpp"
 	
