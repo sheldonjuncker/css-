@@ -4,6 +4,8 @@
 	#include <cstdlib>
 	#include <list>
 	#include <map>
+	#include "tcss.cpp"
+	#include "to_string.cpp"
 	#include "value.cpp"
 	#include "nodes.cpp"
 	

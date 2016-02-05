@@ -10,7 +10,7 @@ class Nodes;
 class Node
 {
 	public:
-	virtual int *evaluate() = 0;
+	virtual Value *evaluate() = 0;
 	void print(std::string s, bool nl = true)
 	{
 		std::cout << s;
@@ -26,7 +26,7 @@ class Nodes : public std::list<Node *>
 {
 	public:
 	//Evaluate All Nodes in a List
-	int *evaluate()
+	Value *evaluate()
 	{
 		Nodes::iterator it;
 		for(it=this->begin(); it != this->end(); ++it)
@@ -55,7 +55,7 @@ class StyleNode : public Node
 		this->body = b;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		if(this->charset)
 			this->charset->evaluate();
@@ -78,7 +78,7 @@ class CharsetNode : public Node
 		this->charset = charset;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print("@charset \"" + charset + "\"");
 		return NULL;
@@ -94,7 +94,7 @@ class ImportNode : public Node
 		this->import = import;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print("@import \"" + import + "\"");
 		return NULL;
@@ -114,7 +114,7 @@ class OpNode : public Node
 		this->right = right;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		this->left->evaluate();
 		if(this->op != ',')
@@ -144,7 +144,7 @@ class DeclNode : public Node
 		this->important = i;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		std::cout << "\t" << prop << ": ";
 		this->value->evaluate();
@@ -167,7 +167,7 @@ class StrNode : public Node
 		this->str = s;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print(str, false);
 		return NULL;
@@ -184,7 +184,7 @@ class IdNode : public Node
 		this->id = i;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print(id, false);
 		return NULL;
@@ -207,7 +207,7 @@ class FuncNode : public Node
 		this->exp = e;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		std::cout << name;
 		if(this->exp)
@@ -235,7 +235,7 @@ class PageNode : public Node
 		this->declarations = d;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		std::cout << "@page";
 		if(this->type != "")
@@ -265,7 +265,7 @@ class VarNode : public Node
 		this->declarations = d;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		
 		return NULL;
@@ -290,7 +290,7 @@ class RulesetNode : public Node
 		this->declarations = d;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		this->selector_list->evaluate();
 		print("{");
@@ -318,7 +318,7 @@ class PseudoSelectorNode : public Node
 		this->pseudo = p;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		this->selector->evaluate();
 		this->pseudo->evaluate();
@@ -347,7 +347,7 @@ class PseudoBlockNode : public Node
 		this->function = f;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		if(this->ident != "")
 			print(":" + this->ident, false);
@@ -375,7 +375,7 @@ class PseudoElementNode : public Node
 		this->name = n;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		std::cout << "::" << name;
 		return NULL;
@@ -399,7 +399,7 @@ class SeparatorNode : public Node
 		this->sep = s;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		std::cout << sep;
 		return NULL;
@@ -422,7 +422,7 @@ class SelectorNode : public Node
 		this->name = n;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print(this->name, false);
 		return NULL;
@@ -448,7 +448,7 @@ class CombinatorNode : public Node
 		this->op = o;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		this->left->evaluate();
 		std:: cout << " " << this->op << " ";
@@ -476,7 +476,7 @@ class AttrSelectNode : public Node
 		this->value = v;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print("[", false);
 		print(this->ident, false);
@@ -500,7 +500,7 @@ class UriNode : public Node
 		this->uri = u;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print(this->uri, false);
 		return NULL;
@@ -517,7 +517,7 @@ class NumNode : public Node
 		this->num = n;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		std::cout << num;
 		return NULL;
@@ -534,7 +534,7 @@ class PerNode : public Node
 		this->per = p;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		std::cout << per;
 		return NULL;
@@ -545,17 +545,25 @@ class PerNode : public Node
 class DimNode : public Node
 {
 	public:
-	double dim;
+	double value;
 	std::string type;
 	DimNode(std::string t)
 	{
-		//this->dim = d;
+		//Get value from dimension
+		this->value = atof(t.c_str());
+		
+		//Convert value to string
+		std::string v = String(this->value);
+		
+		//Remove value form dimension
+		t.erase(0, v.length());
+		
 		this->type = t;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
-		std::cout << type;
+		std::cout << value << type;
 		return NULL;
 	}
 };
@@ -574,7 +582,7 @@ class HashNode : public Node
 		this->hash = h;
 	}
 	
-	int *evaluate()
+	Value *evaluate()
 	{
 		print(hash, false);
 		return NULL;

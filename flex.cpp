@@ -51,8 +51,7 @@ nl             \n|\r\n|\r|\f
 "@media"       		{return MEDIA_SYM;}
 "@charset"          {return CHARSET_SYM;}
 "!important"        {return IMPORTANT_SYM;} 
-{num}{ident}			{return DIMENSION;}
-{num}%			        {return PERCENTAGE;}
+{num}({ident}|%)			{yylval.string = strdup(yytext); return DIMENSION;}
 {num}			        {return NUMBER;}
 
 "url("{string}")" {return URI;}

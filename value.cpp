@@ -8,7 +8,6 @@ class Value;
 //Dimension Type
 struct Dim
 {
-	public:
 	double value;
 	std::string dim; //px, em, %, etc.
 };
@@ -73,9 +72,59 @@ class Value
 		this->v.i = i;
 	}
 	
+	//Dimension Constructor
+	Value(Dim *d)
+	{
+		this->t = DIM;
+		this->v.dim = d;
+	}
+	
 	/*
 		Member Functions
 	*/
+	
+	/*
+		Operators:
+		+
+		-
+		*
+		/
+	*/
+	
+	//Addition
+	Value *add(Value *v1)
+	{
+		//Integers
+		if(this->t == INT && v1->t == INT)
+		{
+			return new Value(v.i + v1->v.i);
+		}
+		
+		//Doubles
+		else if(this->t == DUB && v1->t == DUB)
+		{
+			return new Value(v.d + v1->v.d);
+		}
+		
+		//String
+		else if(this->t == STR && v1->t == STR)
+		{
+			return new Value(*(v.s) + *(v1->v.s));
+		}
+		
+		//Dimension
+		else if(this->t == DIM && v1->t == DIM && v.dim->dim == v1->v.dim->dim)
+		{
+			Dim *dim = new Dim();
+			dim->value = this->v.dim->value + v1->v.dim->value;
+			dim->dim = this->v.dim->dim;
+			return new Value(dim);
+		}
+		
+		//Return NULL
+		
+		return new Value();
+	}
 	
 	//Convert to String
 	std::string toString()
@@ -83,11 +132,11 @@ class Value
 		switch(this->t)
 		{
 			case INT:
-			
+				return String(v.i);
 			break;
 			
 			case DUB:
-			
+				return String(v.d);
 			break;
 			
 			case STR:
@@ -99,7 +148,7 @@ class Value
 			break;
 			
 			case DIM:
-			
+				return String(v.dim->value) + v.dim->dim;
 			break;
 			
 			case HEX:
