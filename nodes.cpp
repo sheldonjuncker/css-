@@ -170,7 +170,7 @@ class StrNode : public Node
 	Value *evaluate()
 	{
 		print(str, false);
-		return NULL;
+		return new Value(str);
 	}
 };
 
@@ -503,7 +503,7 @@ class UriNode : public Node
 	Value *evaluate()
 	{
 		print(this->uri, false);
-		return NULL;
+		return new Value(uri);
 	}
 };
 
@@ -520,24 +520,7 @@ class NumNode : public Node
 	Value *evaluate()
 	{
 		std::cout << num;
-		return NULL;
-	}
-};
-
-//Percent Node
-class PerNode : public Node
-{
-	public:
-	double per;
-	PerNode(double p)
-	{
-		this->per = p;
-	}
-	
-	Value *evaluate()
-	{
-		std::cout << per;
-		return NULL;
+		return new Value(num);
 	}
 };
 
@@ -564,7 +547,8 @@ class DimNode : public Node
 	Value *evaluate()
 	{
 		std::cout << value << type;
-		return NULL;
+		Dim *d = new Dim(value, type);
+		return new Value(d);
 	}
 };
 

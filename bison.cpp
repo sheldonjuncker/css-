@@ -37,7 +37,6 @@
 %token IMPORT_SYM IMPORTANT_SYM MEDIA_SYM
 %token <string> NUMBER
 %token PAGE_SYM
-%token <string> PERCENTAGE 
 %token <string> URI
 
 %type <c> operator combinator
@@ -465,10 +464,6 @@ term_numeral
     : NUMBER
 	{
 		$$ = new NumNode(atof($1));
-	}
-    | PERCENTAGE
-	{
-		$$ = new PerNode(atof($1));
 	}
     | DIMENSION
 	{

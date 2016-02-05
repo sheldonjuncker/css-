@@ -10,6 +10,12 @@ struct Dim
 {
 	double value;
 	std::string dim; //px, em, %, etc.
+	
+	Dim(double v = 0, std::string d = "")
+	{
+		value = v;
+		dim = d;
+	}
 };
 
 //Data Types Enum
@@ -38,6 +44,7 @@ union Val
 //Value Class
 class Value
 {
+	public: 
 	//Data Type
 	Types t;
 	
@@ -122,7 +129,7 @@ class Value
 		}
 		
 		//Return NULL
-		
+		TCSS::warning("Using operators on invalid data types.");
 		return new Value();
 	}
 	
