@@ -53,7 +53,7 @@ stylesheet // : [ CHARSET_SYM STRING ';' ]?
            //   [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
     : charset import_block body {
 		$$ = new StyleNode($1, $2, $3);
-		$$->evaluate();
+		std::cout << $$->evaluate();
 	}
 ;
 
@@ -463,7 +463,7 @@ term // : unary_operator?
 term_numeral
     : NUMBER
 	{
-		$$ = new NumNode(atof($1));
+		$$ = new NumNode($1);
 	}
     | DIMENSION
 	{

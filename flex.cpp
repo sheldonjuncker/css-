@@ -52,7 +52,7 @@ nl             \n|\r\n|\r|\f
 "@charset"          {return CHARSET_SYM;}
 "!important"        {return IMPORTANT_SYM;} 
 {num}({ident}|%)			{yylval.string = strdup(yytext); return DIMENSION;}
-{num}			        {return NUMBER;}
+{num}			        { yylval.string = strdup(yytext); return NUMBER;}
 
 "url("{string}")" {return URI;}
 "url("{url}")"    {return URI;}

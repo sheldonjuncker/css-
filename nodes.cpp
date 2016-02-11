@@ -10,7 +10,7 @@ class Nodes;
 class Node
 {
 	public:
-	virtual Value *evaluate() = 0;
+	virtual std::string evaluate() = 0;
 	void print(std::string s, bool nl = true)
 	{
 		std::cout << s;
@@ -26,13 +26,16 @@ class Nodes : public std::list<Node *>
 {
 	public:
 	//Evaluate All Nodes in a List
-	Value *evaluate()
+	std::string evaluate()
 	{
+		std::string css = "";
 		Nodes::iterator it;
 		for(it=this->begin(); it != this->end(); ++it)
 		{
-			(*it)->evaluate();
+			css += (*it)->evaluate();
 		}
+		
+		return css;
 	}
 };
 
@@ -55,17 +58,19 @@ class StyleNode : public Node
 		this->body = b;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		if(this->charset)
-			this->charset->evaluate();
+		//CSS
+		std::string css;
+		if(charset)
+			css = charset->evaluate();
 		
-		if(this->import)
-			this->import->evaluate();
+		if(import)
+			css = import->evaluate();
 		
 		if(this->body)
-			this->body->evaluate();
-		return NULL;
+			css = body->evaluate();
+		return css;
 	}
 };
 
@@ -78,10 +83,9 @@ class CharsetNode : public Node
 		this->charset = charset;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print("@charset \"" + charset + "\"");
-		return NULL;
+		return "@charset \"" + charset + "\"";
 	}
 };
 
@@ -94,10 +98,9 @@ class ImportNode : public Node
 		this->import = import;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print("@import \"" + import + "\"");
-		return NULL;
+		return "@import \"" + import + "\"";
 	}
 };
 
@@ -114,14 +117,9 @@ class OpNode : public Node
 		this->right = right;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		this->left->evaluate();
-		if(this->op != ',')
-			std::cout << " ";
-		std::cout << op << " ";
-		this->right->evaluate();
-		return NULL;
+		return "calc(" + left->evaluate() + " " + op + " " + right->evaluate() + ")";
 	}
 };
 
@@ -144,16 +142,9 @@ class DeclNode : public Node
 		this->important = i;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		std::cout << "\t" << prop << ": ";
-		this->value->evaluate();
-		if(this->important)
-		{
-			std::cout << "!important";
-		}
-		std::cout << ";\n";
-		return NULL;
+		return "\t" + prop + ": " + value->evaluate()  + ((important) ? "!important" : "") + ";\n";
 	}
 };
 
@@ -167,10 +158,9 @@ class StrNode : public Node
 		this->str = s;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print(str, false);
-		return new Value(str);
+		return str;
 	}
 };
 
@@ -184,10 +174,9 @@ class IdNode : public Node
 		this->id = i;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print(id, false);
-		return NULL;
+		return id;
 	}
 };
 
@@ -207,14 +196,9 @@ class FuncNode : public Node
 		this->exp = e;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		std::cout << name;
-		if(this->exp)
-			this->exp->evaluate();
-		std::cout << ")";
-		
-		return NULL;
+		return name + ((exp) ? exp->evaluate() : "") + ")";
 	}
 };
 
@@ -235,16 +219,9 @@ class PageNode : public Node
 		this->declarations = d;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		std::cout << "@page";
-		if(this->type != "")
-			std::cout << " :" << type;
-		std::cout << "{\n";
-		this->declarations->evaluate();
-		std::cout << "}";
-		
-		return NULL;
+		return "@page" + ((type != "") ? " :" + type : "") + "{\n" + declarations->evaluate() + "}";
 	}
 };
 
@@ -265,10 +242,10 @@ class VarNode : public Node
 		this->declarations = d;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		
-		return NULL;
+		//Process
+		return "";
 	}
 };
 
@@ -290,14 +267,9 @@ class RulesetNode : public Node
 		this->declarations = d;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		this->selector_list->evaluate();
-		print("{");
-		if(this->declarations)
-			this->declarations->evaluate();
-		print("}");
-		return NULL;
+		return selector_list->evaluate() + "{\n" + ((declarations) ? declarations->evaluate() : "") + "}";
 	}
 };
 
@@ -318,11 +290,9 @@ class PseudoSelectorNode : public Node
 		this->pseudo = p;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		this->selector->evaluate();
-		this->pseudo->evaluate();
-		return NULL;
+		return selector->evaluate() + pseudo->evaluate();
 	}
 };
 
@@ -347,16 +317,9 @@ class PseudoBlockNode : public Node
 		this->function = f;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		if(this->ident != "")
-			print(":" + this->ident, false);
-		else
-		{
-			std::cout << ":";
-			this->function->evaluate();
-		}
-		return NULL;
+		return (ident != "") ? ":" + ident : ":" + function->evaluate();
 	}
 };
 
@@ -375,10 +338,9 @@ class PseudoElementNode : public Node
 		this->name = n;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		std::cout << "::" << name;
-		return NULL;
+		return "::" + name;
 	}
 };
 
@@ -399,10 +361,9 @@ class SeparatorNode : public Node
 		this->sep = s;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		std::cout << sep;
-		return NULL;
+		return sep;
 	}
 };
 
@@ -422,10 +383,9 @@ class SelectorNode : public Node
 		this->name = n;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print(this->name, false);
-		return NULL;
+		return name;
 	}
 };
 
@@ -448,12 +408,9 @@ class CombinatorNode : public Node
 		this->op = o;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		this->left->evaluate();
-		std:: cout << " " << this->op << " ";
-		this->right->evaluate();
-		return NULL;
+		return left->evaluate() + " " + op + " " + right->evaluate();
 	}
 };
 
@@ -476,17 +433,9 @@ class AttrSelectNode : public Node
 		this->value = v;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print("[", false);
-		print(this->ident, false);
-		if(this->value)
-		{
-			this->op->evaluate();
-			this->value->evaluate();
-		}
-		print("]", false);
-		return NULL;
+		return "[" + ident + ((value) ? op->evaluate() + value->evaluate() : "") + "]";
 	}
 };
 
@@ -500,10 +449,9 @@ class UriNode : public Node
 		this->uri = u;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print(this->uri, false);
-		return new Value(uri);
+		return uri;
 	}
 };
 
@@ -511,16 +459,15 @@ class UriNode : public Node
 class NumNode : public Node
 {
 	public:
-	double num;
-	NumNode(double n)
+	std::string num;
+	NumNode(std::string n)
 	{
 		this->num = n;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		std::cout << num;
-		return new Value(num);
+		return num;
 	}
 };
 
@@ -528,27 +475,15 @@ class NumNode : public Node
 class DimNode : public Node
 {
 	public:
-	double value;
-	std::string type;
-	DimNode(std::string t)
+	std::string dim;
+	DimNode(std::string d)
 	{
-		//Get value from dimension
-		this->value = atof(t.c_str());
-		
-		//Convert value to string
-		std::string v = String(this->value);
-		
-		//Remove value form dimension
-		t.erase(0, v.length());
-		
-		this->type = t;
+		this->dim = d;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		std::cout << value << type;
-		Dim *d = new Dim(value, type);
-		return new Value(d);
+		return dim;
 	}
 };
 
@@ -566,9 +501,8 @@ class HashNode : public Node
 		this->hash = h;
 	}
 	
-	Value *evaluate()
+	std::string evaluate()
 	{
-		print(hash, false);
-		return NULL;
+		return hash;
 	}
 };
