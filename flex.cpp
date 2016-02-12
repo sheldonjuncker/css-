@@ -31,6 +31,7 @@ nl             \n|\r\n|\r|\f
 
 \/\*[^*]*\*+([^/*][^*]*\*+)*\/       /* ignore comments */
 \/\/.*
+"#!".*
 
 "~="                    {return INCLUDES;}
 "|="                    {return DASHMATCH;}

@@ -521,7 +521,18 @@ hexcolor // : HASH S* ;
 	I'll need nodes (classes) for the following:
 */
 
-main()
+int main(int argc, char **argv)
 {
+	extern FILE *yyin;
+	
+	//Process File (CGI)
+	if(argc >= 2)
+	{
+		std::cout << "Content-type: text/css\n\n";
+		yyin = fopen(argv[1], "r");
+	}
+	
     yyparse();
+	
+	return 0;
 }
