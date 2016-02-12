@@ -32,7 +32,7 @@
 %token <string> STRING
 %token <string> FUNCTION
 %token <string> HASH
-%token <string> IDENT
+%token <string> IDENT VAR
 %token <string> INCLUDES
 %token IMPORT_SYM IMPORTANT_SYM MEDIA_SYM
 %token <string> NUMBER
@@ -205,14 +205,21 @@ ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declarat
 	}
 ;
 
+/*
+	Variable Declarations and Assignments
+*/
 variables
-	: '$' IDENT '{' declarations '}'
+	: VAR '{' declarations '}'
 	{
-		$$ = new VarNode($2, $4);
+		$$ = new VarDeclNode($1, $3);
 	}
-	| '$' IDENT '{' '}'
+	| VAR '{' '}'
 	{
-		$$ = new VarNode($2, NULL);	
+		$$ = new VarDeclNode($1, NULL);	
+	}
+	| VAR ':' expr_list ';'
+	{
+		$$ = new VarAssignNode($1, $3);
 	}
 
 /*
@@ -449,6 +456,10 @@ term // : unary_operator?
     | hexcolor
 	{
 		$$ = $1;
+	}
+	| VAR
+	{
+		$$ = new VarNode($1);
 	}
     | function
 	{

@@ -42,6 +42,8 @@ nl             \n|\r\n|\r|\f
 {ident}	                { yylval.string = strdup(yytext);
                           return IDENT;}
 
+"$"{ident}				{ yylval.string = strdup(yytext); return VAR; }
+
 "#"[0-9a-f]{3}([0-9a-f]{3})?	{ yylval.string = strdup(yytext); return HASH; } /*
 "#"{name}               { yylval.string = strdup(yytext); return HASH;}
 */

@@ -6,6 +6,9 @@
 class Node;
 class Nodes;
 
+//Variables
+std::map<std::string, std::string> vars;
+
 //The Node Class
 class Node
 {
@@ -221,7 +224,7 @@ class PageNode : public Node
 	
 	std::string evaluate()
 	{
-		return "@page" + ((type != "") ? " :" + type : "") + "{\n" + declarations->evaluate() + "}";
+		return "@page" + ((type != "") ? " :" + type : "") + "{\n" + declarations->evaluate() + "}\n\n";
 	}
 };
 
@@ -230,13 +233,13 @@ class PageNode : public Node
 	Example:
 		$Vars{ mainColor: red; }
 */
-class VarNode : public Node
+class VarDeclNode : public Node
 {
 	public:
 	std::string className;
 	Nodes *declarations;
 	
-	VarNode(std::string c, Nodes *d = NULL)
+	VarDeclNode(std::string c, Nodes *d = NULL)
 	{
 		this->className = c;
 		this->declarations = d;
@@ -269,7 +272,7 @@ class RulesetNode : public Node
 	
 	std::string evaluate()
 	{
-		return selector_list->evaluate() + "{\n" + ((declarations) ? declarations->evaluate() : "") + "}";
+		return selector_list->evaluate() + "{\n" + ((declarations) ? declarations->evaluate() : "") + "}\n\n";
 	}
 };
 
@@ -504,5 +507,52 @@ class HashNode : public Node
 	std::string evaluate()
 	{
 		return hash;
+	}
+};
+
+/*
+	Var Node
+	Example:
+		$ident
+*/
+class VarNode : public Node
+{
+	public:
+	std::string var;
+	VarNode(std::string v)
+	{
+		this->var = v;
+	}
+	
+	std::string evaluate()
+	{
+		return (vars.find(var) != vars.end()) ? vars[var] : "";
+	}
+};
+
+/*
+	Var Assign Node
+	Example:
+		$ident : exp;
+*/
+class VarAssignNode : public Node
+{
+	public:
+	std::string var;
+	Nodes *exp;
+	VarAssignNode(std::string v, Nodes *e = NULL)
+	{
+		this->var = v;
+		this->exp = e;
+	}
+	
+	std::string evaluate()
+	{
+		std::string val = "";
+		if(exp)
+			val = exp->evaluate();
+		vars[var] = val;
+		
+		return "";
 	}
 };

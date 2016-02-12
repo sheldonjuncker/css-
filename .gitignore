@@ -2,3 +2,5 @@
 bison.tab.cpp
 lex.yy.c
 bison.output
+features.txt
+nodes.cpp.bak
