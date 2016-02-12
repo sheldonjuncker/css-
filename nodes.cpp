@@ -9,6 +9,9 @@ class Nodes;
 //Variables
 std::map<std::string, std::string> vars;
 
+//Declarations
+std::map<std::string, std::string> decls;
+
 //The Node Class
 class Node
 {
@@ -229,7 +232,7 @@ class PageNode : public Node
 };
 
 /*
-	Variable Node
+	Variable Declaration Node
 	Example:
 		$Vars{ mainColor: red; }
 */
@@ -248,10 +251,32 @@ class VarDeclNode : public Node
 	std::string evaluate()
 	{
 		//Process
+		decls[className] = declarations->evaluate();
 		return "";
 	}
 };
 
+/*
+	Variable Declaration Include Node
+	Example:
+		.big-button{ $button; }
+*/
+class VarDeclIncNode : public Node
+{
+	public:
+	std::string className;
+	
+	VarDeclIncNode(std::string c)
+	{
+		this->className = c;
+	}
+	
+	std::string evaluate()
+	{
+		//Process
+		return decls[className];
+	}
+};
 
 /*
 	Ruleset Node
@@ -526,7 +551,17 @@ class VarNode : public Node
 	
 	std::string evaluate()
 	{
-		return (vars.find(var) != vars.end()) ? vars[var] : "";
+		//Not Found
+		if(vars.find(var) ==  vars.end())
+		{
+			TCSS::warning("Use of undefined variable " + var);
+			return "";
+		}
+		
+		else
+		{
+			return vars[var];
+		}
 	}
 };
 

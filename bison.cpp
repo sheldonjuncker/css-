@@ -405,6 +405,10 @@ declaration // : property ':' S* expr prio? ;
     { 
 		$$ = new DeclNode($1, $3);
 	}
+	| VAR
+	{
+		$$ = new VarDeclIncNode($1);
+	}
 ;
 
 expr_list
