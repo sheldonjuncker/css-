@@ -313,7 +313,8 @@ std::string recursive_ruleset(RulesetNode *ruleset, std::string selector)
 	std::string result = "";
 	
 	//Current Selector Name
-	std::string selector_string = selector + (selector == "" ? "" : " ") + ruleset->selector_list->evaluate();
+	std::string list = ruleset->selector_list->evaluate();
+	std::string selector_string = selector + (isalpha(list[0]) ? " " : "") + list;
 	
 	//Get Declarations
 	result += selector_string + "{\n" + ((ruleset->declarations) ? ruleset->declarations->evaluate() : "") + "}\n\n";
