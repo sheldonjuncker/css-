@@ -5,13 +5,14 @@
 //Definitions
 class Node;
 class Nodes;
+class RulesetNode;
 
 //Variables
 std::map<std::string, std::string> vars;
 
 //Declarations
 std::map<std::string, std::string> decls;
-
+ 
 //The Node Class
 class Node
 {
@@ -278,6 +279,8 @@ class VarDeclIncNode : public Node
 	}
 };
 
+std::string recursive_ruleset(RulesetNode *ruleset, std::string selector = "");
+
 /*
 	Ruleset Node
 	Example:
@@ -288,18 +291,46 @@ class RulesetNode : public Node
 	public:
 	Nodes *selector_list;
 	Nodes *declarations;
+	Nodes *sub_rulesets;
 	
-	RulesetNode(Nodes *s, Nodes *d = NULL)
+	RulesetNode(Nodes *s, Nodes *d = NULL, Nodes *sub = NULL)
 	{
 		this->selector_list = s;
 		this->declarations = d;
+		this->sub_rulesets = sub;
 	}
 	
 	std::string evaluate()
-	{
-		return selector_list->evaluate() + "{\n" + ((declarations) ? declarations->evaluate() : "") + "}\n\n";
+	{	
+		return recursive_ruleset(this);
 	}
 };
+
+//Recursive Subruleset Function
+std::string recursive_ruleset(RulesetNode *ruleset, std::string selector)
+{
+	//Result String
+	std::string result = "";
+	
+	//Current Selector Name
+	std::string selector_string = selector + (selector == "" ? "" : " ") + ruleset->selector_list->evaluate();
+	
+	//Get Declarations
+	result += selector_string + "{\n" + ((ruleset->declarations) ? ruleset->declarations->evaluate() : "") + "}\n\n";
+	
+	//Get Subrulesets
+	if(!ruleset->sub_rulesets)
+	{
+		return result;
+	}
+	
+	for(Nodes::iterator it = ruleset->sub_rulesets->begin(); it != ruleset->sub_rulesets->end(); ++it)
+	{
+		result += recursive_ruleset((RulesetNode*) *it, selector_string);
+	}
+	
+	return result;
+}
 
 /*
 	Pseudo Selector Node

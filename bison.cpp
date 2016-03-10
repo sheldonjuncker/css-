@@ -40,7 +40,7 @@
 %token <string> URI
 
 %type <c> operator combinator
-%type <node_list> body expr_list declarations selector_list
+%type <node_list> body expr_list declarations selector_list rulesets
 %type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset variables
 
 %error-verbose
@@ -194,6 +194,7 @@ property // : IDENT S* ;
 ;
 */
 
+/*
 ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
     : selector_list '{' declarations '}'
 	{
@@ -204,7 +205,39 @@ ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declarat
 		$$ = new RulesetNode($1);	
 	}
 ;
+*/
 
+ruleset // : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
+    : selector_list '{' '}'
+	{
+		$$ = new RulesetNode($1, NULL, NULL);
+	}
+	| selector_list '{' declarations '}'
+	{
+		$$ = new RulesetNode($1, $3, NULL);
+	}
+	| selector_list '{' rulesets '}'
+	{
+		$$ = new RulesetNode($1, NULL, $3);
+	}
+	| selector_list '{' declarations rulesets '}'
+	{
+		$$ = new RulesetNode($1, $3, $4);
+	}
+;
+
+rulesets
+	: ruleset
+	{
+		$$ = new Nodes();
+		$$->push_back($1);
+	}
+	| rulesets ruleset
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
+;
 /*
 	Variable Declarations and Assignments
 */
@@ -380,24 +413,20 @@ pseudo_block
 ;
 
 declarations
-    : declaration
+    : declaration ';'
 	{
 		$$ = new Nodes();
 		$$->push_back($1);
 	}
-    | declarations ';' declaration
+    | declarations declaration ';'
 	{
-		$1->push_back($3);
-		$$ = $1;
-	}
-	| declarations ';'
-	{
+		$1->push_back($2);
 		$$ = $1;
 	}
 ;
 
 declaration // : property ':' S* expr prio? ;
-    : IDENT ':' expr_list prio
+	: IDENT ':' expr_list prio
     { 
 		$$ = new DeclNode($1, $3, true);
 	}
