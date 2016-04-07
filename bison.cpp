@@ -24,6 +24,7 @@
 	Node *node;
 	Nodes *node_list;
 	char c;
+	char *op;
 }
 
 %token CHARSET_SYM
@@ -38,10 +39,12 @@
 %token <string> NUMBER
 %token PAGE_SYM
 %token <string> URI
+%token <op> CMP_OP
 
 %type <c> operator combinator
-%type <node_list> body expr_list declarations selector_list rulesets
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset variables
+%type <node_list> body expr_list declarations selector_list rulesets media_query_list media_expr_list
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset variables media_expr media_query
+%type <string> media_feature media_type
 
 %error-verbose
 %locations
@@ -90,11 +93,11 @@ body
 		$1->push_back($2);
 		$$ = $1;
 	}
-    /*| body media
+	| body MEDIA_SYM media_query_list '{' rulesets '}'
 	{
-		$1->push_back($2);
+		$1->push_back(new MediaQueryNode($3, $5));
 		$$ = $1;
-	}*/
+	}
 	| body variables
 	{
 		$1->push_back($2);
@@ -107,25 +110,70 @@ body
 	}
 ;
 
-/*
-media // : MEDIA_SYM S* media_list '{' S* ruleset* '}' S* ;
-    : MEDIA_SYM media_list '{' rulesets '}'
+media_query_list
+	: media_query
 	{
-		//$$ = new MediaNode($2, $4);	
+		$$ = new Nodes();
+		$$->push_back($1);
 	}
-;
-*/
+	| media_query_list "or"	media_query
+	{
+		$1->push_back($3);
+		$$ = $1;
+	}
 
-/*
-media_list // : medium [ COMMA S* medium]* ;
-    : medium						
-    | media_list ',' medium
-;
+media_query
+	: IDENT media_expr_list
+	{
+		//$$ = new MediaQueryNode($1, $2);
+		$$ = NULL;
+	}
 
-medium // : IDENT S* ;
-    : IDENT
-;
-*/
+	| media_expr_list
+	{
+		//$$ = new MediaQueryNode(NULL, $2);
+		$$ = NULL;
+	}
+
+media_expr_list
+	: media_expr
+	{
+		$$ = new Nodes();
+		$$->push_back($1);
+	}
+	| media_expr_list "and" media_expr
+	{
+		$1->push_back($3);
+		$$ = $1;
+	}
+	
+media_expr
+	: media_type
+	{
+		$$ = new IdNode($1);
+	}
+	| '(' media_feature ')'
+	{
+		$$ = new IdNode($2);
+	}
+	| '(' media_feature CMP_OP expr ')'
+	{
+		//$$ = new MediaCmpNode($2, $3, $4);
+		$$ = NULL;
+	}
+
+media_type
+	: IDENT
+	{
+		$$ = $1;
+	}
+
+media_feature
+	: IDENT
+	{
+		$$ = $1;
+	}
+
 
 page // : PAGE_SYM S* pseudo_page?
      //   '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;

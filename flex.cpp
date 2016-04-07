@@ -26,7 +26,6 @@ nl             \n|\r\n|\r|\f
 */
 
 %%
-
 {s} /* ignore spaces */
 
 \/\*[^*]*\*+([^/*][^*]*\*+)*\/       /* ignore comments */
@@ -35,6 +34,9 @@ nl             \n|\r\n|\r|\f
 
 "~="                    {return INCLUDES;}
 "|="                    {return DASHMATCH;}
+"="					{yylval.op = strdup(yytext); return CMP_OP;}
+">="					{yylval.op = strdup(yytext); return CMP_OP;}
+"<="					{yylval.op = strdup(yytext); return CMP_OP;}
 
 {string}                { yylval.string = strdup(yytext);
                           return STRING;
@@ -49,9 +51,9 @@ nl             \n|\r\n|\r|\f
 "#"{name}               { yylval.string = strdup(yytext); return HASH;}
 */
 
+"@media"				{return MEDIA_SYM;}
 "@import"     		{return IMPORT_SYM;}
 "@page"           	{return PAGE_SYM;}
-"@media"       		{return MEDIA_SYM;}
 "@charset"          {return CHARSET_SYM;}
 "!important"        {return IMPORTANT_SYM;} 
 {num}({ident}|%)			{yylval.string = strdup(yytext); return DIMENSION;}
@@ -59,7 +61,6 @@ nl             \n|\r\n|\r|\f
 
 "url("{string}")" {return URI;}
 "url("{url}")"    {return URI;}
-
 {ident}"("		        {yylval.string = strdup(yytext); return FUNCTION;}
 
 .			            {return *yytext;}

@@ -111,6 +111,23 @@ class ImportNode : public Node
 	}
 };
 
+//Media Query Node
+class MediaQueryNode : public Node
+{
+	public:
+	Nodes *list, *rulesets;
+	MediaQueryNode(Nodes *l, Nodes *r)
+	{
+		this->list = l;
+		this->rulesets = r;
+	}
+	
+	std::string evaluate()
+	{
+		return "media query!";
+	}
+};
+
 //Operator Node
 class OpNode : public Node
 {
