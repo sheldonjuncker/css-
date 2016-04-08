@@ -40,6 +40,7 @@
 %token PAGE_SYM
 %token <string> URI
 %token <op> CMP_OP
+%token AND OR
 
 %type <c> operator combinator
 %type <node_list> body expr_list declarations selector_list rulesets media_query_list media_expr_list
@@ -116,8 +117,10 @@ media_query_list
 		$$ = new Nodes();
 		$$->push_back($1);
 	}
-	| media_query_list "or"	media_query
+	| media_query_list OR media_query
 	{
+		//Separator or
+		$1->push_back(new SeparatorNode(", "));
 		$1->push_back($3);
 		$$ = $1;
 	}
@@ -125,14 +128,12 @@ media_query_list
 media_query
 	: IDENT media_expr_list
 	{
-		//$$ = new MediaQueryNode($1, $2);
-		$$ = NULL;
+		$$ = new QueryNode($1, $2);
 	}
 
 	| media_expr_list
 	{
-		//$$ = new MediaQueryNode(NULL, $2);
-		$$ = NULL;
+		$$ = new QueryNode("", $1);
 	}
 
 media_expr_list
@@ -141,8 +142,10 @@ media_expr_list
 		$$ = new Nodes();
 		$$->push_back($1);
 	}
-	| media_expr_list "and" media_expr
+	| media_expr_list AND media_expr
 	{
+		//Separator and
+		$1->push_back(new SeparatorNode(" and "));
 		$1->push_back($3);
 		$$ = $1;
 	}
@@ -154,12 +157,15 @@ media_expr
 	}
 	| '(' media_feature ')'
 	{
-		$$ = new IdNode($2);
+		$$ = new MediaFeatureNode($2, NULL, NULL);
 	}
 	| '(' media_feature CMP_OP expr ')'
 	{
-		//$$ = new MediaCmpNode($2, $3, $4);
-		$$ = NULL;
+		$$ = new MediaFeatureNode($2, $3, $4);
+	}
+	| '(' media_feature ':' expr ')'
+	{
+		$$ = new MediaFeatureNode($2, ":", $4);
 	}
 
 media_type

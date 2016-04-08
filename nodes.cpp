@@ -124,7 +124,83 @@ class MediaQueryNode : public Node
 	
 	std::string evaluate()
 	{
-		return "media query!";
+		return "@media " + list->evaluate() + "{\n" + rulesets->evaluate() + "}\n";
+	}
+};
+
+/*
+	Query Node
+	only|not	media_expr_list
+	empty		media_expr_list
+*/
+class QueryNode : public Node
+{
+	public:
+	std::string notOnly;
+	Nodes *list;
+	QueryNode(std::string n, Nodes *l)
+	{
+		this->notOnly = n;
+		this->list = l;
+	}
+	
+	std::string evaluate()
+	{
+		return notOnly + " " + list->evaluate();
+	}
+};
+
+
+/*
+	Media Featire Node
+	(width = 50px)
+	(screen)
+*/
+class MediaFeatureNode : public Node
+{
+	public:
+	std::string feature;
+	std::string op;
+	Node *expr;
+	MediaFeatureNode(std::string f, std::string o = "", Node *e = NULL)
+	{
+		this->feature = f;
+		this->op = o;
+		this->expr = e;
+	}
+	
+	std::string evaluate()
+	{
+		//(media_feature)
+		if(op == "")
+		{
+			return "(" + this->feature + ")";
+		}
+		
+		else
+		{
+			/*
+				Media Feature Operators
+				Equality
+					=	->	:
+					>=	->	: min-
+					<=	->	: max-
+			*/
+			if(op == "=" || op == ":")
+			{
+				return "(" + this->feature + ": " + this->expr->evaluate() + ")";
+			}
+			
+			else if(op == ">=")
+			{
+				return "(min-" + this->feature + ": " + this->expr->evaluate(); ")";
+			}
+			
+			else if(op == "<=")
+			{
+				return "(max-" + this->feature + ": " + this->expr->evaluate(); ")";
+			}
+		}
 	}
 };
 

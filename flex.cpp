@@ -32,6 +32,8 @@ nl             \n|\r\n|\r|\f
 \/\/.*
 "#!".*
 
+"&&"|"and"				{return AND;}
+"||"|","|"or"			{return OR;}
 "~="                    {return INCLUDES;}
 "|="                    {return DASHMATCH;}
 "="					{yylval.op = strdup(yytext); return CMP_OP;}
