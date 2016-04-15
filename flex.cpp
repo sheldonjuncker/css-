@@ -53,10 +53,11 @@ nl             \n|\r\n|\r|\f
 "#"{name}               { yylval.string = strdup(yytext); return HASH;}
 */
 
-"@media"				{return MEDIA_SYM;}
+"@media"			{return MEDIA_SYM;}
 "@import"     		{return IMPORT_SYM;}
 "@page"           	{return PAGE_SYM;}
 "@charset"          {return CHARSET_SYM;}
+"@if"				{return IF;}
 "!important"        {return IMPORTANT_SYM;} 
 {num}({ident}|%)			{yylval.string = strdup(yytext); return DIMENSION;}
 {num}			        { yylval.string = strdup(yytext); return NUMBER;}

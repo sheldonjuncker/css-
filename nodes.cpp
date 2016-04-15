@@ -2,6 +2,9 @@
 	Nodes for TCSS
 */
 
+//Agent Info Identifers
+std::map <std::string, int> agent_idents;
+
 //Definitions
 class Node;
 class Nodes;
@@ -111,6 +114,279 @@ class ImportNode : public Node
 	}
 };
 
+
+/*
+	=============================================
+	START:	If Condition Nodes
+	=============================================
+*/
+
+/*
+	If Node
+	Example:
+		@if Windows{
+			p{
+				font-family:"Times New Roman";
+			}
+		}
+*/
+class IfNode : public Node
+{
+	public:
+	Node *cond;
+	Nodes *body;
+	IfNode(Node *c, Nodes *b)
+	{
+		this->cond = c;
+		this->body = b;
+	}
+	
+	std::string evaluate()
+	{
+		std::string veracity = cond->evaluate();
+		std::cout << veracity;
+		if(veracity == "true")
+		{
+			return body->evaluate();
+		}
+		
+		else
+		{
+			return "";
+		}
+	}
+};
+
+/*
+	Conditional Identifier Node
+	Example:
+		Windows|Linux|Mac|UnknownOS
+		Firefox|IE|Safari|Chrome|Opera|[etc]
+*/
+class CondIdNode : public Node
+{
+	public:
+	std::string ident;
+	CondIdNode(std::string id)
+	{
+		this->ident = id;
+	}
+	
+	std::string evaluate()
+	{
+		AgentInfo *agent = UserAgent::getAgentInfo();
+		
+		//Platform
+		if(!strncmp(agent->platform.c_str(), "Windows", 7))
+		{
+			agent_idents["Windows"] = 1;
+			if(agent->platform == "Windows")
+				agent_idents["Desktop"] = 1;
+			else
+				agent_idents["Mobile"] = 1;
+		}
+		else if(agent->platform == "Linux")
+		{
+			agent_idents["Linux"] = 1;
+			agent_idents["Desktop"] = 1;
+		}
+		else if(agent->platform == "Android")
+		{
+			agent_idents["Android"] = 1;
+			agent_idents["Mobile"] = 1;
+		}
+		else if(agent->platform == "Kindle")
+		{
+			agent_idents["Kindle"] = 1;
+			agent_idents["Mobile"] = 1;
+		}
+		else if(agent->platform == "Macintosh")
+		{
+			agent_idents["Apple"] = 1;
+			agent_idents["Desktop"] = 1;
+		}
+		else if(agent->platform == "iPod")
+		{
+			agent_idents["Apple"] = 1;
+			agent_idents["Mobile"] = 1;
+		}
+		else if(agent->platform == "iPad")
+		{
+			agent_idents["Apple"] = 1;
+			agent_idents["Mobile"] = 1;
+		}
+		else if(!strncmp(agent->platform.c_str(), "Xbox", 4))
+		{
+			agent_idents["Xbox"] = 1;
+			agent_idents["Console"] = 1;
+		}
+		else if(!strncmp(agent->platform.c_str(), "Nintendo", 8))
+		{
+			agent_idents["Nintendo"] = 1;
+			agent_idents["Console"] = 1;
+		}
+		else if(!strncmp(agent->platform.c_str(), "PlayStation", 11))
+		{
+			agent_idents["PlayStation"] = 1;
+			agent_idents["Console"] = 1;
+		}
+		
+		//Browser
+		if(agent->browser == "Firefox")
+			agent_idents["Firefox"] = 1;
+		else if(agent->browser == "Chrome")
+			agent_idents["Chrome"] = 1;
+		else if(agent->browser == "MSIE")
+			agent_idents["IE"] = 1;
+		else if(agent->browser == "Safari")
+			agent_idents["Safari"] = 1;
+		else if(agent->browser == "Opera")
+			agent_idents["Opera"] = 1;
+		else if(agent->browser == "Kindle")
+			agent_idents["KindleBrowser"] = 1;
+		else if(!strncmp(agent->browser._cstr(), "Android", 7))
+			agent_idents["AndroidBrowser"] = 1;
+	}
+};
+
+/*
+	Conditional Comparison Node
+	Example:
+		Version > 8.0
+		OS = Windows
+		Browser = Firefox
+*/
+class CondCmpNode : public Node
+{
+	public:
+	std::string ident;
+	std::string op;
+	Node *exp;
+	CondCmpNode(std::string id, std::string o, Node *e)
+	{
+		this->ident = id;
+		this->op = o;
+		this->exp = e;
+	}
+	
+	std::string evaluate()
+	{
+		CondIdNode *cid = new CondIdNode(ident);
+		std::string veracity = cid->evaluate();
+		return "/*Condition: " + ident + op + exp->evaluate() +  "*/";
+	}
+};
+
+/*
+	Conditional And Node
+	Example:
+		IE and Version > 8.0
+*/
+class CondAndNode : public Node
+{
+	public:
+	Node *left;
+	Node *right;
+	CondAndNode(Node *l, Node *r)
+	{
+		this->left = l;
+		this->right = r;
+	}
+	
+	std::string evaluate()
+	{
+		//Veracity of Conditions
+		std::string vleft = left->evaluate();
+		std::string vright = right->evaluate();
+		if(vleft == "true" && vright == "true")
+		{
+			return "true";
+		}
+		
+		else
+		{
+			return "false";
+		}
+	}
+};
+
+/*
+	Conditional Or Node
+	Example:
+		Opera or Safar or Chrome
+*/
+class CondOrNode : public Node
+{
+	public:
+	Node *left;
+	Node *right;
+	CondOrNode(Node *l, Node *r)
+	{
+		this->left = l;
+		this->right = r;
+	}
+	
+	std::string evaluate()
+	{
+		//Veracity of Conditions
+		std::string vleft = left->evaluate();
+		std::string vright = right->evaluate();
+		if(vleft == "true" && vright == "true")
+		{
+			return "true";
+		}
+		
+		else
+		{
+			return "false";
+		}
+	}
+};
+
+/*
+	Conditional Not Node
+	Example:
+		!Windows
+*/
+class CondNotNode : public Node
+{
+	public:
+	Node *right;
+	CondNotNode(Node *r)
+	{
+		this->right = r;
+	}
+	
+	std::string evaluate()
+	{
+		//Veracity of Condition
+		std::string vright = right->evaluate();
+		if(vright == "true")
+		{
+			return "false";
+		}
+		
+		else
+		{
+			return "true";
+		}
+	}
+};
+
+/*
+	=============================================
+	END:	If Condition Nodes
+	=============================================
+*/
+
+
+
+/*
+	=============================================
+	START:	Media Query Nodes
+	=============================================
+*/
+
 //Media Query Node
 class MediaQueryNode : public Node
 {
@@ -203,6 +479,13 @@ class MediaFeatureNode : public Node
 		}
 	}
 };
+
+/*
+	=============================================
+	END:	Media Query Nodes
+	=============================================
+*/
+
 
 //Operator Node
 class OpNode : public Node

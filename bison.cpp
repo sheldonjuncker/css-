@@ -1,12 +1,14 @@
 //The TCSS Bison File
 %{
 	#include <iostream>
+	#include <stdio.h>
 	#include <cstdlib>
 	#include <list>
 	#include <map>
 	#include "tcss.cpp"
 	#include "to_string.cpp"
 	#include "value.cpp"
+	#include "UserAgent.cpp"
 	#include "nodes.cpp"
 	
 	int yyerror(const char *p)
@@ -40,11 +42,13 @@
 %token PAGE_SYM
 %token <string> URI
 %token <op> CMP_OP
-%token AND OR
+%token IF
+%left '!'
+%left AND OR
 
 %type <c> operator combinator
 %type <node_list> body expr_list declarations selector_list rulesets media_query_list media_expr_list
-%type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset variables media_expr media_query
+%type <node> stylesheet charset import_block expr term term_numeral hexcolor page attrib_eq attrib_value function declaration  pseudo_block pseudo_expr pseudo_class_selector attribute_selector id_selector type_selector class_selector simple_selector compound_selector universal_selector complex_selector ruleset variables media_expr media_query if cond_expr
 %type <string> media_feature media_type
 
 %error-verbose
@@ -104,12 +108,67 @@ body
 		$1->push_back($2);
 		$$ = $1;
 	}
+	| body if
+	{
+		$1->push_back($2);
+		$$ = $1;
+	}
     | body page
 	{
 		$1->push_back($2);
 		$$ = $1;
 	}
 ;
+/*
+	Begin:	IF
+	Desc:	This section is the grammar for if statements.
+	They take the form of:
+	@if condition{
+		.css{
+			
+		}
+	}
+*/
+if
+	: IF cond_expr '{' body '}'
+	{
+		$$ = new IfNode($2, $4);
+	}
+	
+cond_expr
+	: IDENT
+	{
+		$$ = new CondIdNode($1);
+	}
+	| IDENT CMP_OP expr
+	{
+		//For >=, <=, and =
+		$$ = new CondCmpNode($1, $2, $3);
+	}
+	| IDENT '>' expr
+	{
+		$$ = new CondCmpNode($1, ">", $3);
+	}
+	| IDENT '<' expr
+	{
+		$$ = new CondCmpNode($1, "<", $3);
+	}
+	| cond_expr AND cond_expr
+	{
+		$$ = new CondAndNode($1, $3);
+	}
+	| cond_expr OR cond_expr
+	{
+		$$ = new CondOrNode($1, $3);
+	}
+	| '!' cond_expr
+	{
+		$$ = new CondNotNode($2);
+	}
+	| '(' cond_expr ')'
+	{
+		$$ = $2;
+	}
 
 media_query_list
 	: media_query
@@ -606,6 +665,39 @@ hexcolor // : HASH S* ;
 
 int main(int argc, char **argv)
 {
+	std::string agent_info[] = {
+		//Browsers
+		"IE",
+		"Firefox",
+		"Chrome",
+		"Safari",
+		"Opera",
+		"AndroidBrowser",
+		"KindleBrowser",
+		"UnknownBrowser",
+		"Version",
+		//Operating Systems
+		"Windows",
+		"Linux",
+		"Apple",
+		"Nintendo",
+		"PlayStation",
+		"Xbox",
+		"Kindle",
+		"Android",
+		"UnknownOS",
+		//Platform Type
+		"Mobile",
+		"Desktop",
+		"Console",
+		"UnknownType"
+	};
+	
+	for(int i=0; i<(sizeof(agent_info) / sizeof(agent_info[0])); i++)
+	{
+		agent_idents[agent_info[i]] = 0;
+	}
+	
 	extern FILE *yyin;
 	
 	//Process File (CGI)
@@ -615,7 +707,21 @@ int main(int argc, char **argv)
 		yyin = fopen(argv[1], "r");
 	}
 	
-    yyparse();
+	yyparse();
+	
+	AgentInfo *agent = UserAgent::getAgentInfo();
+	
+	if(agent != NULL)
+	{
+		std::cout << agent->platform;
+		std::cout << agent->browser;
+		std::cout << agent->version;
+	}
+	
+	else
+	{
+		printf("Error!");
+	}
 	
 	return 0;
 }

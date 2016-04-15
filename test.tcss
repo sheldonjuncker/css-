@@ -1,5 +1,9 @@
-$color: red;
-.css{
-	color: $color;
+.text{
+	@if	{
+		color: red;
+	}
 }
 
+@if OSX{
+	
+}
