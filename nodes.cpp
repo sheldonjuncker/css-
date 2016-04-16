@@ -144,7 +144,6 @@ class IfNode : public Node
 	std::string evaluate()
 	{
 		std::string veracity = cond->evaluate();
-		std::cout << veracity;
 		if(veracity == "true")
 		{
 			return body->evaluate();
@@ -174,78 +173,15 @@ class CondIdNode : public Node
 	
 	std::string evaluate()
 	{
-		AgentInfo *agent = UserAgent::getAgentInfo();
-		
-		//Platform
-		if(!strncmp(agent->platform.c_str(), "Windows", 7))
+		if(agent_idents.find(ident) != agent_idents.end())
 		{
-			agent_idents["Windows"] = 1;
-			if(agent->platform == "Windows")
-				agent_idents["Desktop"] = 1;
-			else
-				agent_idents["Mobile"] = 1;
-		}
-		else if(agent->platform == "Linux")
-		{
-			agent_idents["Linux"] = 1;
-			agent_idents["Desktop"] = 1;
-		}
-		else if(agent->platform == "Android")
-		{
-			agent_idents["Android"] = 1;
-			agent_idents["Mobile"] = 1;
-		}
-		else if(agent->platform == "Kindle")
-		{
-			agent_idents["Kindle"] = 1;
-			agent_idents["Mobile"] = 1;
-		}
-		else if(agent->platform == "Macintosh")
-		{
-			agent_idents["Apple"] = 1;
-			agent_idents["Desktop"] = 1;
-		}
-		else if(agent->platform == "iPod")
-		{
-			agent_idents["Apple"] = 1;
-			agent_idents["Mobile"] = 1;
-		}
-		else if(agent->platform == "iPad")
-		{
-			agent_idents["Apple"] = 1;
-			agent_idents["Mobile"] = 1;
-		}
-		else if(!strncmp(agent->platform.c_str(), "Xbox", 4))
-		{
-			agent_idents["Xbox"] = 1;
-			agent_idents["Console"] = 1;
-		}
-		else if(!strncmp(agent->platform.c_str(), "Nintendo", 8))
-		{
-			agent_idents["Nintendo"] = 1;
-			agent_idents["Console"] = 1;
-		}
-		else if(!strncmp(agent->platform.c_str(), "PlayStation", 11))
-		{
-			agent_idents["PlayStation"] = 1;
-			agent_idents["Console"] = 1;
+			return agent_idents[ident] ? "true" : "false";
 		}
 		
-		//Browser
-		if(agent->browser == "Firefox")
-			agent_idents["Firefox"] = 1;
-		else if(agent->browser == "Chrome")
-			agent_idents["Chrome"] = 1;
-		else if(agent->browser == "MSIE")
-			agent_idents["IE"] = 1;
-		else if(agent->browser == "Safari")
-			agent_idents["Safari"] = 1;
-		else if(agent->browser == "Opera")
-			agent_idents["Opera"] = 1;
-		else if(agent->browser == "Kindle")
-			agent_idents["KindleBrowser"] = 1;
-		else if(!strncmp(agent->browser._cstr(), "Android", 7))
-			agent_idents["AndroidBrowser"] = 1;
+		else
+		{
+			return "false";
+		}
 	}
 };
 
@@ -271,9 +207,27 @@ class CondCmpNode : public Node
 	
 	std::string evaluate()
 	{
-		CondIdNode *cid = new CondIdNode(ident);
-		std::string veracity = cid->evaluate();
-		return "/*Condition: " + ident + op + exp->evaluate() +  "*/";
+		//The only string that is supported is
+		//currently "Version" for browser versions.
+		
+		//CondIdNode *cid = new CondIdNode(ident);
+		//std::string veracity = cid->evaluate();
+		int version = agent_idents["Version"];
+		std::string eval_exp = exp->evaluate();
+		int versionOperand = atoi(eval_exp.c_str());
+		
+		if(op == "=")
+			return version == versionOperand ? "true" : "false";
+		else if(op == ">")
+			return version > versionOperand ? "true" : "false";
+		else if(op == "<")
+			return version < versionOperand ? "true" : "false";
+		else if(op == ">=")
+			return version >= versionOperand ? "true" : "false";
+		else if(op == "<=")
+			return version <= versionOperand ? "true" : "false";
+		else
+			return "false";
 	}
 };
 
@@ -331,7 +285,7 @@ class CondOrNode : public Node
 		//Veracity of Conditions
 		std::string vleft = left->evaluate();
 		std::string vright = right->evaluate();
-		if(vleft == "true" && vright == "true")
+		if(vleft == "true" || vright == "true")
 		{
 			return "true";
 		}

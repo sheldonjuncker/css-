@@ -665,6 +665,7 @@ hexcolor // : HASH S* ;
 
 int main(int argc, char **argv)
 {
+	//Comparsion Identifiers
 	std::string agent_info[] = {
 		//Browsers
 		"IE",
@@ -693,10 +694,111 @@ int main(int argc, char **argv)
 		"UnknownType"
 	};
 	
+	//Initialize with False
 	for(int i=0; i<(sizeof(agent_info) / sizeof(agent_info[0])); i++)
 	{
 		agent_idents[agent_info[i]] = 0;
 	}
+	
+	//Gather and Parse User Agent Info
+	AgentInfo *agent = UserAgent::getAgentInfo();
+		
+	std::string platform;
+	std::string browser;
+	std::string platform_type;
+	
+	//Platform
+	if(!strncmp(agent->platform.c_str(), "Windows", 7))
+	{
+		platform = "Windows";
+		if(agent->platform == "Windows")
+			platform_type = "Desktop";
+		else
+			platform_type = "Mobile";
+	}
+	else if(agent->platform == "Linux")
+	{
+		platform = "Linux";
+		platform_type = "Desktop";
+	}
+	else if(agent->platform == "Android")
+	{
+		platform = "Android";
+		platform_type = "Mobile";
+	}
+	else if(agent->platform == "Kindle")
+	{
+		platform = "Kindle";
+		platform_type = "Mobile";
+	}
+	else if(agent->platform == "Macintosh")
+	{
+		platform = "Apple";
+		platform_type = "Desktop";
+	}
+	else if(agent->platform == "iPod")
+	{
+		platform = "Apple";
+		platform_type = "Mobile";
+	}
+	else if(agent->platform == "iPhone")
+	{
+		platform = "Apple";
+		platform_type = "Mobile";
+	}
+	else if(agent->platform == "iPad")
+	{
+		platform = "Apple";
+		platform_type = "Mobile";
+	}
+	else if(!strncmp(agent->platform.c_str(), "Xbox", 4))
+	{
+		platform = "Xbox";
+		platform_type = "Console";
+	}
+	else if(!strncmp(agent->platform.c_str(), "Nintendo", 8))
+	{
+		platform = "Nintendo";
+		platform_type = "Console";
+	}
+	else if(!strncmp(agent->platform.c_str(), "PlayStation", 11))
+	{
+		platform = "PlayStation";
+		platform_type = "Console";
+	}
+	else
+	{
+		platform = "UnknownOS";
+		platform_type = "UnknownType";
+	}
+	
+	//Browser
+	if(agent->browser == "Firefox")
+		browser = "Firefox";
+	else if(agent->browser == "Chrome")
+		browser = "Chrome";
+	else if(agent->browser == "MSIE")
+		browser = "IE";
+	else if(agent->browser == "Safari")
+		browser = "Safari";
+	else if(agent->browser == "Opera")
+		browser = "Opera";
+	else if(agent->browser == "Kindle")
+		browser = "KindleBrowser";
+	else if(!strncmp(agent->browser.c_str(), "Android", 7))
+		browser = "AndroidBrowser";
+	else
+		browser = "UnknownBrowser";
+	
+	
+	//Add Platform
+	agent_idents[platform] = 1;
+	
+	//Add Browser
+	agent_idents[browser] = 1;
+	
+	//Add Browser Version
+	agent_idents["Version"] = atoi(agent->version.c_str());
 	
 	extern FILE *yyin;
 	
@@ -709,13 +811,13 @@ int main(int argc, char **argv)
 	
 	yyparse();
 	
-	AgentInfo *agent = UserAgent::getAgentInfo();
+	AgentInfo *uagent = UserAgent::getAgentInfo();
 	
 	if(agent != NULL)
 	{
-		std::cout << agent->platform;
-		std::cout << agent->browser;
-		std::cout << agent->version;
+		std::cout << uagent->platform;
+		std::cout << uagent->browser;
+		std::cout << uagent->version;
 	}
 	
 	else

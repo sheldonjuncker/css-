@@ -1,9 +1,0 @@
-.text{
-	@if	{
-		color: red;
-	}
-}
-
-@if OSX{
-	
-}
