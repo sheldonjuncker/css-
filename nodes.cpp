@@ -2,9 +2,6 @@
 	Nodes for TCSS
 */
 
-//Agent Info Identifers
-std::map <std::string, int> agent_idents;
-
 //Definitions
 class Node;
 class Nodes;

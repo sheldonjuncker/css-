@@ -20,7 +20,7 @@ function parse_user_agent( $u_agent ) {
 	$platform = null;
 	$browser  = null;
 	$version  = null;
-	$empty = array( 'platform' => $platform, 'browser' => $browser, 'version' => $version );
+	$empty = "$platform:$browser:$version";
 	if( !$u_agent ) return $empty;
 	if( preg_match('/\((.*?)\)/im', $u_agent, $parent_matches) ) {
 		preg_match_all('/(?P<platform>BB\d+;|Android|CrOS|Tizen|iPhone|iPad|iPod|Linux|Macintosh|Windows(\ Phone)?|Silk|linux-gnu|BlackBerry|PlayBook|X11|(New\ )?Nintendo\ (WiiU?|3?DS)|Xbox(\ One)?)

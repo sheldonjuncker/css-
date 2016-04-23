@@ -1,14 +1,13 @@
-struct TCSS
+#include <string>
+#include <iostream>
+#include "tcss.h"
+
+void TCSS::warning(std::string s)
 {
-	static bool issueWarnings;
-	
-	static void warning(std::string s)
-	{
-		if(!issueWarnings)
-			return;
+	if(!issueWarnings)
+		return;
 		
-		std::cout << "Warning: " << s << ".\n";
-	}
-};
+	std::cout << "Warning: " << s << ".\n";
+}
 
 bool TCSS::issueWarnings = 1;
